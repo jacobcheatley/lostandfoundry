@@ -120,7 +120,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1097308950487722305}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 103944718615122363}
+        m_MethodName: Click
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &103944718615122363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,8 +146,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   titleText: {fileID: 1097308951534154211}
   costText: {fileID: 1691076174517030108}
+  backgroundImage: {fileID: 1097308950487722305}
   connectionPrefab: {fileID: 6205176520144456352, guid: 4be0c721b04fdab47a94cb13a53fb528,
     type: 3}
+  notUnlockableVisual: {fileID: 11400000, guid: cc34aaa23b5fc8c43a4b40668cf3cbaa,
+    type: 2}
+  notAffordableVisual: {fileID: 11400000, guid: 50defdb6778e4a64dae080cc79608387,
+    type: 2}
+  unlockableVisual: {fileID: 11400000, guid: c1e4976793f26334686a01c644a5898a, type: 2}
+  unlockedVisual: {fileID: 11400000, guid: cc61ac8027c1e72458574eab879305a0, type: 2}
 --- !u!1 &1097308951534154209
 GameObject:
   m_ObjectHideFlags: 0

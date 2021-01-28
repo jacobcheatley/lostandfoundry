@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 [Flags]
 public enum SkillID
@@ -28,6 +25,7 @@ public enum SkillID
     Branch22X = 16384 * 8,
     ThisThing = 16384 * 16
 }
+
 public class Skill
 {
     public SkillID required;
@@ -46,9 +44,9 @@ public class Skill
     }
 }
 
-public class SkillTree
+public static class SkillTree
 {
-    public Dictionary<SkillID, Skill> skills = new Dictionary<SkillID, Skill> {
+    public static Dictionary<SkillID, Skill> skills = new Dictionary<SkillID, Skill> {
         { SkillID.Free, new Skill(SkillID.None, "Free skill", "Free skill! Amazing", "", 0) },
         { SkillID.Branch1, new Skill(SkillID.Free, "Branch 1", "Description", "", 15) },
         { SkillID.Branch11, new Skill(SkillID.Branch1, "Branch 1-1", "Description", "", 30) },
@@ -69,25 +67,4 @@ public class SkillTree
         { SkillID.Branch21X, new Skill(SkillID.Branch21, "Branch 21X", "Description", "", 150) },
         { SkillID.Branch22X, new Skill(SkillID.Branch22, "Branch 22X", "Description", "", 150) },
     };
-    public SkillID unlockedSkills = 0;
-
-    public SkillTree()
-    {
-        
-    }
-
-    public Skill this[SkillID index]
-    {
-        get => skills[index];
-    }
-
-    public void UnlockSkill(SkillID skillID)
-    {
-        unlockedSkills |= skillID;
-    }
-
-    public bool IsSkillUnlocked(SkillID skillID)
-    {
-        return (unlockedSkills & skillID) == skillID;
-    }
 }
