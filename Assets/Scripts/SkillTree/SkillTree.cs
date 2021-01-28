@@ -46,7 +46,7 @@ public class Skill
 
 public static class SkillTree
 {
-    public static Dictionary<SkillID, Skill> skills = new Dictionary<SkillID, Skill> {
+    public static readonly Dictionary<SkillID, Skill> skills = new Dictionary<SkillID, Skill> {
         { SkillID.Free, new Skill(SkillID.None, "Free skill", "Free skill! Amazing", "", 0) },
         { SkillID.Branch1, new Skill(SkillID.Free, "Branch 1", "Description", "", 15) },
         { SkillID.Branch11, new Skill(SkillID.Branch1, "Branch 1-1", "Description", "", 30) },

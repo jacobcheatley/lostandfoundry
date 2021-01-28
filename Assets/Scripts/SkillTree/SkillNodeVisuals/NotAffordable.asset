@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2139601fdcf9304e90b8e8ffbd118da, type: 3}
   m_Name: NotAffordable
   m_EditorClassIdentifier: 
-  textColor: {r: 0, g: 0, b: 0, a: 0}
-  backgroundColor: {r: 1, g: 1, b: 1, a: 0}
-  connectionColor: {r: 0.49803922, g: 0.49803922, b: 0.49803922, a: 0}
+  textColor: {r: 0, g: 0, b: 0, a: 1}
+  costColor: {r: 1, g: 0, b: 0, a: 1}
+  backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+  connectionColor: {r: 0.49803922, g: 0.49803922, b: 0.49803922, a: 1}
   displayTooltip: 1
   displayCost: 1
+  glow: 0
