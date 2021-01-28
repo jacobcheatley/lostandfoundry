@@ -41,5 +41,6 @@ public class Hook : MonoBehaviour
     {
         // TODO: Collision logic
         Debug.Log($"Collided {collision.gameObject.name}");
+
     }
 }
