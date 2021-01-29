@@ -15,7 +15,7 @@ MonoBehaviour:
   textColor: {r: 0, g: 0, b: 0, a: 1}
   costColor: {r: 0, g: 0, b: 0, a: 1}
   backgroundColor: {r: 0.49803922, g: 1, b: 0, a: 1}
-  connectionColor: {r: 1, g: 1, b: 1, a: 1}
+  connectionColor: {r: 1, g: 1, b: 1, a: 0.39215687}
   displayTooltip: 1
   displayCost: 0
   glow: 0

@@ -11,11 +11,12 @@ public class SkillConnection : MonoBehaviour
     {
         RectTransform fromRect = from.GetComponent<RectTransform>();
         RectTransform toRect = to.GetComponent<RectTransform>();
-        Vector2 fromPosition = (Vector3)fromRect.anchoredPosition + fromRect.right * fromRect.rect.width / 2;
-        Vector2 toPosition = (Vector3)toRect.anchoredPosition - fromRect.right * toRect.rect.width / 2;
+        Vector2 fromPosition = (Vector3)fromRect.anchoredPosition;
+        Vector2 toPosition = (Vector3)toRect.anchoredPosition;
         rectTransform.anchoredPosition = (fromPosition + toPosition) / 2;
         Vector2 difference = toPosition - fromPosition;
         rectTransform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg);
         rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, difference.magnitude);
+        transform.SetAsFirstSibling();
     }
 }
