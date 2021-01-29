@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2139601fdcf9304e90b8e8ffbd118da, type: 3}
+  m_Name: Unlocked
+  m_EditorClassIdentifier: 
+  textColor: {r: 1, g: 1, b: 1, a: 1}
+  costColor: {r: 1, g: 1, b: 1, a: 1}
+  backgroundColor: {r: 0.49803922, g: 1, b: 0, a: 1}
+  connectionColor: {r: 1, g: 1, b: 1, a: 0.39215687}
+  displayTooltip: 1
+  displayCost: 0
+  glow: 0
