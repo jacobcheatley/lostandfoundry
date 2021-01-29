@@ -31,12 +31,15 @@ public class DayNightSwitcher : MonoBehaviour
     [SerializeField]
     private Color dayBackground;
 
+    private static DayNightSwitcher instance;
     private Camera mainCamera;
     private bool day = true;
 
     void Start()
     {
+        instance = this;
         mainCamera = Camera.main;
+        starCanvas.SetActive(false);
     }
 
     void Update()
@@ -108,5 +111,10 @@ public class DayNightSwitcher : MonoBehaviour
             obj.position = Vector3.Lerp(from.position, to.position, Mathf.SmoothStep(0, 1, elapsedTime / timeFrame));
             yield return null;
         }
+    }
+
+    public static bool IsDay()
+    {
+        return instance.day;
     }
 }

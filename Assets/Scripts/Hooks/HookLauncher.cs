@@ -30,7 +30,7 @@ public class HookLauncher : MonoBehaviour
         while (true)
         {
             hookPivot.transform.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(time * dangleSpeed) * dangleAngle / 2);
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && DayNightSwitcher.IsDay())
             {
                 hook.GetComponent<Hook>().Launch();
                 yield break;
