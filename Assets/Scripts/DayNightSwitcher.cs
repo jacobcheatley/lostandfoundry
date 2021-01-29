@@ -10,12 +10,18 @@ public class DayNightSwitcher : MonoBehaviour
     private Transform cameraAnchorDay;
     [SerializeField]
     private Transform cameraAnchorNight;
+    [SerializeField]
+    private Transform alienAnchorDay;
+    [SerializeField]
+    private Transform alienAnchorNight;
 
     [Header("Controlled objects")]
     [SerializeField]
     private GameObject starCanvas;
     [SerializeField]
     private CanvasGroup starCanvasGroup;
+    [SerializeField]
+    private Transform alien;
 
     [Header("Properties and settings")]
     [SerializeField]
@@ -49,6 +55,7 @@ public class DayNightSwitcher : MonoBehaviour
         day = true;
         Debug.Log("Day");
         StartCoroutine(FadeStars(false));
+        StartCoroutine(MoveBetween(alien, alienAnchorNight, alienAnchorDay, 2.5f));
         CameraControl.Follow(cameraAnchorDay, 0.3f);
     }
     
@@ -57,6 +64,7 @@ public class DayNightSwitcher : MonoBehaviour
         day = false;
         Debug.Log("Night");
         StartCoroutine(FadeStars(true));
+        StartCoroutine(MoveBetween(alien, alienAnchorDay, alienAnchorNight, 2.5f));
         CameraControl.Follow(cameraAnchorNight, 0.3f);
     }
 
@@ -87,5 +95,16 @@ public class DayNightSwitcher : MonoBehaviour
         }
         starCanvasGroup.alpha = visible ? 1 : 0;
         starCanvas.SetActive(visible);
+    }
+
+    private IEnumerator MoveBetween(Transform obj, Transform from, Transform to, float timeFrame)
+    {
+        float elapsedTime = 0;
+        while (elapsedTime < timeFrame)
+        {
+            elapsedTime += Time.deltaTime;
+            obj.position = Vector3.Lerp(from.position, to.position, Mathf.SmoothStep(0, 1, elapsedTime / timeFrame));
+            yield return null;
+        }
     }
 }
