@@ -8,7 +8,9 @@ public class Collector : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Hookable"))
         {
-            collision.GetComponent<Hookable>().Collected(gameObject);
+            Hookable other = collision.GetComponent<Hookable>();
+            other.Collected(gameObject);
+            ResourceTracker.Money += other.value;
         }
     }
 }

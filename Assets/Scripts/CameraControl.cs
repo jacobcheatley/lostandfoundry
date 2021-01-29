@@ -21,14 +21,16 @@ public class CameraControl : MonoBehaviour
             transform.position = new Vector3(following.position.x, following.position.y, transform.position.z);
     }
 
-    public static void Follow(Transform follow, float switchSpeedFactor = 2)
+    public static void Follow(Transform follow, float switchSpeedFactor = 2, float delay = 0)
     {
         instance.StopAllCoroutines();
-        instance.StartCoroutine(instance.MoveToFollowNew(follow, switchSpeedFactor));
+        instance.StartCoroutine(instance.MoveToFollowNew(follow, switchSpeedFactor, delay));
     }
 
-    private IEnumerator MoveToFollowNew(Transform follow, float switchSpeedFactor)
+    private IEnumerator MoveToFollowNew(Transform follow, float switchSpeedFactor, float delay)
     {
+        yield return new WaitForSeconds(delay);
+
         following = follow;
         switching = true;
 

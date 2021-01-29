@@ -11,12 +11,11 @@ public class Hookable : Retractable
         // TODO: Some fancy animations here or something.
         //  We want the specifics to be determined by the object type, which
         //  will be somewhere on this GameObject.
-        Debug.Log($"This {gameObject.name} got hooked to {toWhom.name}!");
     }
 
     public void Collected(GameObject byWhom)
     {
-        Debug.Log($"This {gameObject.name} got collected by {byWhom.name}!");
+        // TODO: Some more fancy animations
         Destroy(gameObject);
     }
 

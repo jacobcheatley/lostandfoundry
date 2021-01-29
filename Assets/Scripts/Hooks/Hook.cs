@@ -19,6 +19,9 @@ public class Hook : Retractable
     private LineRenderer ropeRenderer;
     private List<Vector3> ropeRendererPoints = new List<Vector3>();
 
+    [SerializeField]
+    private GameObject retractCameraAnchor;
+
     private bool launched = false;
     private Vector3 movement;
     private List<Coroutine> travellingCoroutines = new List<Coroutine>();
@@ -114,6 +117,8 @@ public class Hook : Retractable
         // Retract ourselves
         StartCoroutine(DoRetract(ropeRendererPoints, transform.position, ropeRendererPoints.Count - 1, retractionRate));
         StartCoroutine(RetractRopeRenderer());
+
+        CameraControl.Follow(retractCameraAnchor.transform, switchSpeedFactor: 0.5f, delay: 0.3f);
     }
 
     private IEnumerator RetractRopeRenderer()
