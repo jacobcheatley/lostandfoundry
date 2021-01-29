@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Hook : MonoBehaviour
+public class Hook : Retractable
 {
     [SerializeField]
     private float speed = 6;
@@ -63,6 +63,7 @@ public class Hook : MonoBehaviour
 
     private void AddRopeRendererPoint(Vector3 point)
     {
+        point.z = 0;
         ropeRenderer.positionCount += 1;
         ropeRenderer.SetPosition(ropeRenderer.positionCount - 1, point);
         ropeRendererPoints.Add(point);
@@ -103,7 +104,38 @@ public class Hook : MonoBehaviour
 
         hookedItems.ForEach(item => item.hookedItem.Retract(ropeRendererPoints, item, retractionRate));
 
-        // TODO: Start a "retract rope" coroutine
+        StartCoroutine(DoRetract(ropeRendererPoints, transform.position, ropeRendererPoints.Count - 1, retractionRate));
+        StartCoroutine(RetractRopeRenderer());
+    }
+
+    private IEnumerator RetractRopeRenderer()
+    {
+        int currentMovingIndex = ropeRenderer.positionCount - 1;
+        while (true)
+        {
+            Vector3 target = ropeRenderer.GetPosition(currentMovingIndex - 1);
+            Vector3 distanceToTarget = target - ropeRenderer.GetPosition(currentMovingIndex);
+
+            ropeRenderer.SetPosition(
+                currentMovingIndex,
+                ropeRenderer.GetPosition(currentMovingIndex) + 
+                    (distanceToTarget.normalized * retractionRate * Time.deltaTime)
+                );
+
+            if (distanceToTarget.sqrMagnitude <= (retractionRate * Time.deltaTime) * (retractionRate * Time.deltaTime))
+            {
+                currentMovingIndex -= 1;
+                ropeRenderer.positionCount -= 1;
+                if (ropeRenderer.positionCount <= 1)
+                {
+                    ropeRenderer.positionCount = 0;
+                    launched = false;
+                    break;
+                }
+            }
+
+            yield return null;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

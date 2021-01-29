@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Hookable : MonoBehaviour
+public class Hookable : Retractable
 {
     public int value;
 
@@ -22,35 +22,6 @@ public class Hookable : MonoBehaviour
 
     public void Retract(List<Vector3> alongLine, HookedItemInfo info, float withSpeed)
     {
-        StartCoroutine(DoRetract(alongLine, info, withSpeed));
-    }
-
-    private IEnumerator DoRetract(List<Vector3> alongLine, HookedItemInfo info, float withSpeed)
-    {
-        Vector3 a = (Vector3)info.hookedItemCollisionPoint - transform.position;
-        a.z = 0;
-
-        int currentTargetIndex = info.ropeRendererPointIndex;
-        while (true)
-        {
-            Vector3 target = alongLine[currentTargetIndex];
-            target.z = transform.position.z;
-
-            Vector3 distanceToTarget = target - (transform.position + a);
-            transform.position += distanceToTarget.normalized * withSpeed * Time.deltaTime;
-
-            // If we're close to the target
-            if (distanceToTarget.sqrMagnitude <= (withSpeed * Time.deltaTime) * (withSpeed * Time.deltaTime))
-            {
-                // Switch target
-                currentTargetIndex -= 1;
-                if (currentTargetIndex < 0)
-                {
-                    break;
-                }
-            }
-
-            yield return null;
-        }
+        StartCoroutine(DoRetract(alongLine, info.hookedItemCollisionPoint, info.ropeRendererPointIndex, withSpeed));
     }
 }
