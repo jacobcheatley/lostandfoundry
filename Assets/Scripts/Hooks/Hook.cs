@@ -26,12 +26,12 @@ public class Hook : MonoBehaviour
         while (true)
         {
             transform.position += movement * speed * Time.deltaTime;
-            if (travelledAFrame && Input.GetMouseButtonDown(0))
-            {
-                // Quantum tunneling
-                transform.position += movement * 3f;
-                CameraControl.Follow(transform);
-            }
+            //if (travelledAFrame && Input.GetMouseButtonDown(0))
+            //{
+            //    // Quantum tunneling
+            //    transform.position += movement * 3f;
+            //    CameraControl.Follow(transform);
+            //}
             yield return null;
             travelledAFrame = true;
         }

@@ -5,8 +5,6 @@ using UnityEngine;
 public class CameraControl : MonoBehaviour
 {
     [SerializeField]
-    private float switchSpeedFactor = 2;
-    [SerializeField]
     private Transform following;
 
     private static CameraControl instance;
@@ -23,13 +21,13 @@ public class CameraControl : MonoBehaviour
             transform.position = new Vector3(following.position.x, following.position.y, transform.position.z);
     }
 
-    public static void Follow(Transform follow)
+    public static void Follow(Transform follow, float switchSpeedFactor = 2)
     {
         instance.StopAllCoroutines();
-        instance.StartCoroutine(instance.MoveToFollowNew(follow));
+        instance.StartCoroutine(instance.MoveToFollowNew(follow, switchSpeedFactor));
     }
 
-    private IEnumerator MoveToFollowNew(Transform follow)
+    private IEnumerator MoveToFollowNew(Transform follow, float switchSpeedFactor)
     {
         following = follow;
         switching = true;
