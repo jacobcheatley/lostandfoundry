@@ -34,11 +34,21 @@ jobs:
           key: Library
 
       # Build
-      - name: Build project
+      - name: Build project non WebGL
         uses: game-ci/unity-builder@v2.0-alpha-6
+        if: ${{ matrix.targetPlatform }} != 'WebGL'
         with:
           unityVersion: ${{ matrix.unityVersion }}
           targetPlatform: ${{ matrix.targetPlatform }}
+          
+      # Build WebGL
+      - name: Build project WebGL
+        uses: game-ci/unity-builder@v2.0-alpha-6
+        if: ${{ matrix.targetPlatform }} == 'WebGL'
+        with:
+          unityVersion: ${{ matrix.unityVersion }}
+          targetPlatform: ${{ matrix.targetPlatform }}
+          customImage: 'jcheatley/unity-web-gl:latest'
 
       # Output
       - uses: actions/upload-artifact@v1
