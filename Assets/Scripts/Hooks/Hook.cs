@@ -39,8 +39,17 @@ public class Hook : Retractable
         transform.parent = null;
         launched = true;
 
+        // We need to prime the rope renderer with a couple of initial points.
+        // The second point gets dragged along with the hook as it travels.
+        AddRopeRendererPoint(transform.position);
+        AddRopeRendererPoint(transform.position);
+
+        // Start the behaviour coroutines:
+        // Movement
         travellingCoroutines.Add(StartCoroutine(Travel()));
+        // Make the rope renderer render the rope at the right position as we travel
         travellingCoroutines.Add(StartCoroutine(UpdateRopeRenderer()));
+        // The hook can only travel for so long before it runs out of time
         travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(launchTimeoutSeconds)));
     }
 
@@ -63,6 +72,8 @@ public class Hook : Retractable
 
     private void AddRopeRendererPoint(Vector3 point)
     {
+        // The rope renderer needs to totally ignore the Z value it gets given, so it's consistent
+        // and its distance measurements work properly.
         point.z = 0;
         ropeRenderer.positionCount += 1;
         ropeRenderer.SetPosition(ropeRenderer.positionCount - 1, point);
@@ -73,24 +84,18 @@ public class Hook : Retractable
     {
         while (true)
         {
-            AddRopeRendererPoint(transform.position);
+            // Drag the last point of the renderer along with us.
+            // We don't ever add any new ones - when other methods add new points, it'll
+            // work as a HARD angle
+            ropeRenderer.SetPosition(
+                ropeRenderer.positionCount - 1,
+                new Vector3(transform.position.x, transform.position.y)
+                );
 
-            // TODO: Optimisation target here
-            //  Only add new points when there's a change
-            for (int i = 0; i < 3; i++)
-            {
-                yield return new WaitForFixedUpdate();
-                yield return new WaitForFixedUpdate();
-                yield return new WaitForFixedUpdate();
-            }
+            yield return new WaitForFixedUpdate();
         }
     }
 
-    /// <summary>
-    /// This is just a test example of using StopTravelling(), since I don't want to rely on right-click
-    /// to stop it due to Fun Multiplatform Shenanigans. Replace it with whatever else once skills are
-    /// defined.
-    /// </summary>
     private IEnumerator StopTravellingAfter(float seconds)
     {
         yield return new WaitForSeconds(seconds);
@@ -99,17 +104,21 @@ public class Hook : Retractable
 
     public void StopTravelling()
     {
-        Debug.Log("Stop hooking!");
+        // We might stop travelling for one of several reasons - timeout, hooked too much, etc.
+        // Regardless, all of our moving-hook-mode coroutines need to stop.
         travellingCoroutines.ForEach(StopCoroutine);
 
+        // Inform each of the hooked items that they've been hooked and should begin being retracted to the colector
         hookedItems.ForEach(item => item.hookedItem.Retract(ropeRendererPoints, item, retractionRate));
 
+        // Retract ourselves
         StartCoroutine(DoRetract(ropeRendererPoints, transform.position, ropeRendererPoints.Count - 1, retractionRate));
         StartCoroutine(RetractRopeRenderer());
     }
 
     private IEnumerator RetractRopeRenderer()
     {
+        // Similar code to Retractable::DoRetract()
         int currentMovingIndex = ropeRenderer.positionCount - 1;
         while (true)
         {
@@ -150,10 +159,12 @@ public class Hook : Retractable
                     }
                 );
 
+            // Add a new point to the rope renderer, in case of future rope-bending upgrades.
             AddRopeRendererPoint(transform.position);
 
             collision.gameObject.GetComponent<Hookable>().Hooked(this.gameObject);
 
+            // Stop condition
             if (hookedItems.Count >= maxHookedItems)
             {
                 StopTravelling();
