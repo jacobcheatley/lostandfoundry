@@ -5,16 +5,21 @@ using UnityEngine;
 
 public class Hook : Retractable
 {
+    [Header("Numeric Config")]
     [SerializeField]
     private float speed = 6;
     [SerializeField]
     private float launchTimeoutSeconds = 2f;
     [SerializeField]
     private int maxHookedItems = 1;
-
     [SerializeField]
     private float retractionRate = 3f;
 
+    [Header("Skill Specifics")]
+    [SerializeField]
+    private float split3Degrees = 15f;
+
+    [Header("GameObject References")]
     [SerializeField]
     private LineRenderer ropeRenderer;
     private List<Vector3> ropeRendererPoints = new List<Vector3>();
@@ -27,10 +32,29 @@ public class Hook : Retractable
     private List<Coroutine> travellingCoroutines = new List<Coroutine>();
 
     private List<HookedItemInfo> hookedItems = new List<HookedItemInfo>();
+    private List<Hook> childHooks = new List<Hook>();
+
+    private bool shouldDestroyOnRetractFinished = false;
 
     private void Start()
     {
         // TODO: Set private fields for upgraded skill levels from SkillManager
+
+        // TODO: DEBUG TEMP
+        ResourceTracker.Money += SkillTree.skills[SkillID.Split3].cost;
+        SkillTracker.UnlockSkill(SkillID.Split3);
+
+        // We need to prime the rope renderer with a couple of initial points.
+        // The second point gets dragged along with the hook as it travels.
+        if (transform.parent == null)
+        {
+            AddRopeRendererPoint(transform.position);
+        }
+        else
+        {
+            AddRopeRendererPoint(transform.parent.position);
+        }
+        AddRopeRendererPoint(transform.position);
     }
 
     public void Launch()
@@ -42,17 +66,23 @@ public class Hook : Retractable
         transform.parent = null;
         launched = true;
 
-        // We need to prime the rope renderer with a couple of initial points.
-        // The second point gets dragged along with the hook as it travels.
-        AddRopeRendererPoint(transform.position);
-        AddRopeRendererPoint(transform.position);
-
         // Start the behaviour coroutines:
         // Movement
         travellingCoroutines.Add(StartCoroutine(Travel()));
-        // Make the rope renderer render the rope at the right position as we travel
-        travellingCoroutines.Add(StartCoroutine(UpdateRopeRenderer()));
         // The hook can only travel for so long before it runs out of time
+        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(launchTimeoutSeconds)));
+    }
+
+    public void LaunchChild(Vector3 orientation)
+    {
+        shouldDestroyOnRetractFinished = true;
+
+        AddRopeRendererPoint(transform.position);
+        AddRopeRendererPoint(transform.position);
+
+        movement = orientation;
+        launched = true;
+        travellingCoroutines.Add(StartCoroutine(Travel()));
         travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(launchTimeoutSeconds)));
     }
 
@@ -83,19 +113,17 @@ public class Hook : Retractable
         ropeRendererPoints.Add(point);
     }
 
-    private IEnumerator UpdateRopeRenderer()
+    private void Update()
     {
-        while (true)
+        // Drag the last point of the renderer along with us.
+        // We don't ever add any new ones here - when other methods add new points, it'll
+        // work as a HARD angle
+        if (ropeRenderer.positionCount > 1)
         {
-            // Drag the last point of the renderer along with us.
-            // We don't ever add any new ones - when other methods add new points, it'll
-            // work as a HARD angle
             ropeRenderer.SetPosition(
                 ropeRenderer.positionCount - 1,
                 new Vector3(transform.position.x, transform.position.y)
                 );
-
-            yield return new WaitForFixedUpdate();
         }
     }
 
@@ -152,9 +180,35 @@ public class Hook : Retractable
         }
     }
 
+    override protected void FinishedRetracting()
+    {
+        StartCoroutine(WaitForAllChildrenToRetract());
+    }
+
+    private IEnumerator WaitForAllChildrenToRetract()
+    {
+        while (true)
+        {
+            if (childHooks.TrueForAll(hook => !hook.isRetracting))
+            {
+                isRetracting = false;
+                if (shouldDestroyOnRetractFinished)
+                {
+                    Destroy(gameObject);
+                }
+            }
+            else
+            {
+                yield return null;
+            }
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Hookable"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Hookable") &&
+            !collision.gameObject.GetComponent<Hookable>().isHooked
+            )
         {
             hookedItems.Add(
                 new HookedItemInfo() { 
@@ -173,6 +227,23 @@ public class Hook : Retractable
             if (hookedItems.Count >= maxHookedItems)
             {
                 StopTravelling();
+            }
+            else if (SkillTracker.IsSkillUnlocked(SkillID.Split3))
+            {
+                for (int i = -1; i < 2; i++)
+                {
+                    if (i == 0)
+                    {
+                        continue;
+                    }
+                    GameObject newObject = Instantiate(gameObject);
+                    Hook newObjectHook = newObject.GetComponent<Hook>();
+                    childHooks.Add(newObjectHook);
+
+                    newObject.transform.localRotation = transform.rotation * Quaternion.Euler(0, 0, i * split3Degrees);
+                    newObject.transform.localScale = transform.localScale * 0.5f;
+                    newObjectHook.LaunchChild(Quaternion.Euler(0, 0, i * split3Degrees) * movement);
+                }
             }
         }
     }

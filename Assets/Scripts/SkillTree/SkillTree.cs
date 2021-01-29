@@ -23,7 +23,7 @@ public enum SkillID
     Branch12X = 16384 * 2,
     Branch21X = 16384 * 4,
     Branch22X = 16384 * 8,
-    ThisThing = 16384 * 16
+    Split3 = 16384 * 16
 }
 
 public class Skill
@@ -61,7 +61,7 @@ public static class SkillTree
         { SkillID.Tier4A, new Skill(SkillID.Tier3, "T4A", "Description", "", 10) },
         { SkillID.Tier4B, new Skill(SkillID.Tier3, "T4B", "Description", "", 10) },
         { SkillID.Tier4C, new Skill(SkillID.Tier4, "T4C", "Description", "", 10) },
-        { SkillID.ThisThing, new Skill(SkillID.Tier2, "Side Thing", "Description", "", 10) },
+        { SkillID.Split3, new Skill(SkillID.Tier2, "Three-Way Split", "Hook splits into three new hooks whenever an item is grabbed", "", 10) },
         { SkillID.Branch11X, new Skill(SkillID.Branch11, "Branch 11X", "Description", "", 150) },
         { SkillID.Branch12X, new Skill(SkillID.Branch12, "Branch 12X", "Description", "", 150) },
         { SkillID.Branch21X, new Skill(SkillID.Branch21, "Branch 21X", "Description", "", 150) },

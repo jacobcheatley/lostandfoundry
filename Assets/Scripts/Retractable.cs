@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Retractable : MonoBehaviour
+public abstract class Retractable : MonoBehaviour
 {
+    public bool isRetracting = false;
+
     protected IEnumerator DoRetract(
         List<Vector3> alongLine, 
         Vector3 hookedItemCollisionPoint, 
@@ -11,6 +13,8 @@ public class Retractable : MonoBehaviour
         float withSpeed
         )
     {
+        isRetracting = true;
+
         Vector3 a = hookedItemCollisionPoint - transform.position;
         a.z = 0;
 
@@ -36,5 +40,8 @@ public class Retractable : MonoBehaviour
 
             yield return null;
         }
+        FinishedRetracting();
     }
+
+    protected abstract void FinishedRetracting();
 }
