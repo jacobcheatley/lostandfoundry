@@ -66,6 +66,7 @@ public class DayNightSwitcher : MonoBehaviour
     
     public void Night()
     {
+        AudioController.EndDepthAudio();
         day = false;
         Debug.Log("Night");
         StartCoroutine(FadeStars(true));
@@ -74,7 +75,6 @@ public class DayNightSwitcher : MonoBehaviour
         CameraControl.Follow(cameraAnchorNight, 4f);
         CameraControl.SetHeight(cameraSizeNight, 2f);
         LevelGenerator.Clear();
-        AudioController.EndDepthAudio();
     }
 
     private void DelayFunction(Action function, float waitTime)

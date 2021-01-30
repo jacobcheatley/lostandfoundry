@@ -33,14 +33,14 @@ public class AudioController : MonoBehaviour
     {
         instance = this;
         clipMap = soundConfiguration.ClipMap();
-        StartCoroutine(WaitForInput());
+        StartPlaying();
     }
 
     public static void StartDepthAudio()
     {
         instance.currentMaxY = 0;
         instance.levelGenerator.OnChunkPlaced += instance.HandlePlacementEvent;
-        MoveToSnapshot(2, 4f);
+        MoveToSnapshot(2, 0.5f);
     }
 
     public static void EndDepthAudio()
@@ -58,20 +58,6 @@ public class AudioController : MonoBehaviour
         }
     }
 
-    private IEnumerator WaitForInput()
-    {
-        while (true)
-        {
-            if (Input.GetMouseButton(0))
-            {
-                yield return null;
-                StartPlaying();
-                break;
-            }
-            yield return null;
-        }
-    }
-
     private void StartPlaying()
     {
         foreach (var audioSource in GetComponents<AudioSource>())
@@ -83,6 +69,7 @@ public class AudioController : MonoBehaviour
 
     public static void MoveToSnapshot(int snapshotIndex, float timeToReach)
     {
+        Debug.Log($"Moving to Snapshot {snapshotIndex}");
         instance.audioMixer.TransitionToSnapshots(new AudioMixerSnapshot[] { instance.snapshots[snapshotIndex] }, new float[] { 1 }, timeToReach);
     }
 

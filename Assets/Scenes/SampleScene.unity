@@ -915,11 +915,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelParent: {fileID: 1833170750}
   depthInfos:
-  - chunkEnd: 3
+  - chunkEnd: 2
     hookables:
     - hookablePrefab: {fileID: 7508560067287861797, guid: c76881c5e51a0924fbc162d4733f0654,
         type: 3}
+      weight: 8
+      unique: 0
+    - hookablePrefab: {fileID: 5277915643351313824, guid: d02da7dc7ca74394d88f9418892d7c08,
+        type: 3}
       weight: 4
+      unique: 0
+    - hookablePrefab: {fileID: 2814779240029175183, guid: 385d586f431075a42a2db364a1a9f003,
+        type: 3}
+      weight: 2
+      unique: 0
+    - hookablePrefab: {fileID: 5185249560817745881, guid: 571a3f8a8cd77e0479f0dcfef14a25f6,
+        type: 3}
+      weight: 4
+      unique: 0
+    - hookablePrefab: {fileID: 5185249560817745881, guid: f1641980234841f4a86884f61539f68f,
+        type: 3}
+      weight: 1
+      unique: 0
+    density: 0.641
+    backgroundPrefab: {fileID: 9211955277169531155, guid: 78add9e7bfe85c24f8880e716c2dd1c8,
+      type: 3}
+  - chunkEnd: 3
+    hookables:
+    - hookablePrefab: {fileID: 5185249560817745881, guid: 571a3f8a8cd77e0479f0dcfef14a25f6,
+        type: 3}
+      weight: 2
       unique: 0
     - hookablePrefab: {fileID: 5277915643351313824, guid: d02da7dc7ca74394d88f9418892d7c08,
         type: 3}
@@ -927,15 +952,62 @@ MonoBehaviour:
       unique: 0
     - hookablePrefab: {fileID: 2814779240029175183, guid: 385d586f431075a42a2db364a1a9f003,
         type: 3}
+      weight: 2
+      unique: 0
+    - hookablePrefab: {fileID: 5185249560817745881, guid: f1641980234841f4a86884f61539f68f,
+        type: 3}
       weight: 1
       unique: 0
+    density: 0.549
+    backgroundPrefab: {fileID: 9211955277169531155, guid: 78add9e7bfe85c24f8880e716c2dd1c8,
+      type: 3}
+  - chunkEnd: 10
+    hookables:
     - hookablePrefab: {fileID: 5185249560817745881, guid: 571a3f8a8cd77e0479f0dcfef14a25f6,
+        type: 3}
+      weight: 1
+      unique: 0
+    - hookablePrefab: {fileID: 5277915643351313824, guid: d02da7dc7ca74394d88f9418892d7c08,
+        type: 3}
+      weight: 1
+      unique: 0
+    - hookablePrefab: {fileID: 2814779240029175183, guid: 385d586f431075a42a2db364a1a9f003,
         type: 3}
       weight: 2
       unique: 0
+    - hookablePrefab: {fileID: 5185249560817745881, guid: f1641980234841f4a86884f61539f68f,
+        type: 3}
+      weight: 2
+      unique: 0
+    density: 0.52
+    backgroundPrefab: {fileID: 9211955277169531155, guid: 78add9e7bfe85c24f8880e716c2dd1c8,
+      type: 3}
+  - chunkEnd: 24
+    hookables:
+    - hookablePrefab: {fileID: 5185249560817745881, guid: f1641980234841f4a86884f61539f68f,
+        type: 3}
+      weight: 1
+      unique: 0
+    - hookablePrefab: {fileID: 2814779240029175183, guid: 385d586f431075a42a2db364a1a9f003,
+        type: 3}
+      weight: 4
+      unique: 0
     density: 0.641
-  background: {fileID: 6696293014873037477, guid: 8927b4549a6f21040bda23b65bd046cc,
-    type: 3}
+    backgroundPrefab: {fileID: 9211955277169531155, guid: 78add9e7bfe85c24f8880e716c2dd1c8,
+      type: 3}
+  - chunkEnd: 42
+    hookables:
+    - hookablePrefab: {fileID: 5185249560817745881, guid: ef38b8973490bdb42b777a76db6952f1,
+        type: 3}
+      weight: 1
+      unique: 0
+    - hookablePrefab: {fileID: 2814779240029175183, guid: 385d586f431075a42a2db364a1a9f003,
+        type: 3}
+      weight: 1
+      unique: 0
+    density: 0.874
+    backgroundPrefab: {fileID: 9211955277169531155, guid: 78add9e7bfe85c24f8880e716c2dd1c8,
+      type: 3}
   backgroundParent: {fileID: 673159293}
   camera: {fileID: 0}
 --- !u!1 &356719029

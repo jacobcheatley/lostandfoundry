@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRetracting: 0
-  value: 100
+  value: 250
   isHooked: 0
 --- !u!60 &1996863768486776815
 PolygonCollider2D:

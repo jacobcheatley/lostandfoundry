@@ -15,8 +15,6 @@ public class LevelGenerator : MonoBehaviour
     private LevelGeneratorDepthInfo[] depthInfos;
 
     [SerializeField]
-    private GameObject background;
-    [SerializeField]
     private Transform backgroundParent;
 
     [SerializeField]
@@ -67,12 +65,27 @@ public class LevelGenerator : MonoBehaviour
         {
             for (int y = 0; y < maxDepth; y++)
             {
-                // Todo background
                 Vector2 chunkCentre = ChunkCentre(x, y);
-                GameObject chunkBg = Instantiate(background, chunkCentre, Quaternion.identity, backgroundParent);
+                LevelGeneratorDepthInfo depthInfo = WhereAmIAt(y).Item2;
+                GameObject chunkBg = Instantiate(depthInfo.backgroundPrefab, chunkCentre, Quaternion.identity, backgroundParent);
                 chunkBg.transform.localPosition = new Vector3(chunkBg.transform.position.x, chunkBg.transform.position.y, 0);
             }
         }
+    }
+
+    private System.Tuple<int, LevelGeneratorDepthInfo> WhereAmIAt(int y)
+    {
+        LevelGeneratorDepthInfo depthInfo = depthInfos[0];
+        int depthInfoIndex;
+        for (depthInfoIndex = 0; depthInfoIndex < depthInfos.Length; depthInfoIndex++)
+        {
+            if (y < depthInfos[depthInfoIndex].chunkEnd)
+            {
+                depthInfo = depthInfos[depthInfoIndex];
+                break;
+            }
+        }
+        return new System.Tuple<int, LevelGeneratorDepthInfo>(depthInfoIndex, depthInfo);
     }
 
     public static void GenerateNew()
@@ -125,15 +138,9 @@ public class LevelGenerator : MonoBehaviour
 
         generatedChunks[x + maxChunkWidth, y] = true;
 
-        Debug.Log($"Generate {x}, {y}");
-
-        LevelGeneratorDepthInfo depthInfo = depthInfos[0];
-        int depthInfoIndex;
-        for (depthInfoIndex = 0; depthInfoIndex < depthInfos.Length; depthInfoIndex++)
-        {
-            if (y < depthInfos[depthInfoIndex].chunkEnd)
-                depthInfo = depthInfos[depthInfoIndex];
-        }
+        System.Tuple<int, LevelGeneratorDepthInfo> d = WhereAmIAt(y);
+        int depthInfoIndex = d.Item1;
+        LevelGeneratorDepthInfo depthInfo = d.Item2;
 
         List<HookableInfo> weightedHookablesThisChunk = objectWeights[depthInfo.chunkEnd];
         Vector2 chunkCentre = ChunkCentre(x, y);

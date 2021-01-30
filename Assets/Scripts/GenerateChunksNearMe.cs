@@ -19,7 +19,6 @@ public class GenerateChunksNearMe : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(interval);
-            Debug.Log((Vector2)transform.position);
             LevelGenerator.PutisSpencerHere(transform.position, radius);
         }
     }
