@@ -54,7 +54,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 3f0f20e3145a8b141bd6ed538649d0e8, type: 3}
   - sfx: 9
     clips:
-    - {fileID: 8300000, guid: 3f0f20e3145a8b141bd6ed538649d0e8, type: 3}
+    - {fileID: 8300000, guid: 949f733e2912edd4fbb661a71ea85871, type: 3}
   - sfx: 10
     clips:
     - {fileID: 8300000, guid: bd77cba8eee58be4d8e504aef7a0bbd6, type: 3}

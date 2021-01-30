@@ -13,6 +13,7 @@ public class Hookable : Retractable
         //  We want the specifics to be determined by the object type, which
         //  will be somewhere on this GameObject.
         isHooked = true;
+        AudioController.PlayRandomSoundClip(SFX.HookGrab);
     }
 
     public void Collected(GameObject byWhom)

@@ -227,11 +227,12 @@ MonoBehaviour:
   isChild: 0
   retractCameraAnchor: {fileID: 0}
   hookPrefab: {fileID: 0}
+  hookLauncher: {fileID: 0}
   ropeRenderer: {fileID: 5058855615198341071}
   maxHookDurationSeconds: 2
   speed: 4
   maxHookedItems: 1
-  retractionRate: 3
+  retractionRate: 12
   durationAddSecondPerLevel: 1
   speedAddPerLevel: 2
   tripleShotDegrees: 15

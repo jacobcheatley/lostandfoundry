@@ -61,6 +61,7 @@ public class DayNightSwitcher : MonoBehaviour
         CameraControl.SetHeight(cameraSizeDay, 2f);
         hookLauncher.ReDangle();
         AudioController.PlayRandomSoundClip(SFX.Dawn);
+        LevelGenerator.GenerateNew();
     }
     
     public void Night()
@@ -72,6 +73,7 @@ public class DayNightSwitcher : MonoBehaviour
         AudioController.MoveToSnapshot(1, 4f);
         CameraControl.Follow(cameraAnchorNight, 4f);
         CameraControl.SetHeight(cameraSizeNight, 2f);
+        LevelGenerator.Clear();
     }
 
     private void DelayFunction(Action function, float waitTime)

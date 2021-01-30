@@ -26,7 +26,7 @@ public class Hook : Retractable
     [SerializeField]
     private int maxHookedItems = 1;
     [SerializeField]
-    private float retractionRate = 3f;
+    private float retractionRate = 12f;
 
     [Header("Skill Specifics")]
     [SerializeField]
