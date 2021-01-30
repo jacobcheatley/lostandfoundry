@@ -20,6 +20,8 @@ public class SkillNode : MonoBehaviour
     private TextMeshProUGUI costText;
     [SerializeField]
     private Image backgroundImage;
+    [SerializeField]
+    private GameObject spinnyStar;
 
     [Header("Prefabs")]
     [SerializeField]
@@ -39,6 +41,7 @@ public class SkillNode : MonoBehaviour
 
     private SkillID skillID;
     private Skill skill;
+    private float spinSpeed = 15f;
 
     private SkillNodeState state;
     private SkillNodeState State 
@@ -63,6 +66,11 @@ public class SkillNode : MonoBehaviour
             }
             state = value;
         } 
+    }
+
+    void Update()
+    {
+        spinnyStar.transform.rotation *= Quaternion.Euler(0, 0, spinSpeed * Time.deltaTime);
     }
 
     public void Initialise(SkillID skillID, GameObject requiredNode)
@@ -107,6 +115,8 @@ public class SkillNode : MonoBehaviour
 
         titleText.text = this.skill.title;
         costText.text = $"${this.skill.cost}";
+
+        backgroundImage.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0, 360));
     }
 
     private void SetVisual(SkillNodeVisual visual)
