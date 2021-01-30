@@ -43,17 +43,17 @@ public class HookLauncher : MonoBehaviour
 
     public void Dangle()
     {
-        ReDangle(transform.position);
+        ReDangle(transform.position, true);
     }
 
-    public void ReDangle(Vector3 fromPosition)
+    public void ReDangle(Vector3 fromPosition, bool initialDangle = false) // Father forgive me, for I have committed spaghetti
     {
         baseHookPivot.transform.position = fromPosition;
         hook.transform.parent = baseHookPivot.transform;
-        StartCoroutine(DangleHook(fromPosition));
+        StartCoroutine(DangleHook(fromPosition, initialDangle));
     }
 
-    private IEnumerator DangleHook(Vector3 fromPosition)
+    private IEnumerator DangleHook(Vector3 fromPosition, bool initialDangle = false)
     {
         float time = 0;
 
@@ -83,6 +83,8 @@ public class HookLauncher : MonoBehaviour
             if (Input.GetMouseButtonDown(0) && DayNightSwitcher.IsDay())
             {
                 hook.GetComponent<Hook>().Launch();
+                if (initialDangle)
+                    AudioController.StartDepthAudio();
                 yield break;
             }
             time += Time.deltaTime;

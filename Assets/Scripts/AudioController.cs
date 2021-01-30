@@ -23,13 +23,39 @@ public class AudioController : MonoBehaviour
     [SerializeField]
     private Dictionary<SFX, AudioClip[]> clipMap;
 
+    [SerializeField]
+    private LevelGenerator levelGenerator;
+
     private static AudioController instance;
+    private int currentMaxY = 0;
 
     private void Start()
     {
         instance = this;
         clipMap = soundConfiguration.ClipMap();
         StartCoroutine(WaitForInput());
+    }
+
+    public static void StartDepthAudio()
+    {
+        instance.currentMaxY = 0;
+        instance.levelGenerator.OnChunkPlaced += instance.HandlePlacementEvent;
+        MoveToSnapshot(2, 4f);
+    }
+
+    public static void EndDepthAudio()
+    {
+        instance.levelGenerator.OnChunkPlaced -= instance.HandlePlacementEvent;
+        MoveToSnapshot(0, 4f);
+    }
+
+    private void HandlePlacementEvent(Vector2 chunkCentre, int x, int y, int depthIndex, bool deepestSinceRegen, bool initialGen)
+    {
+        if (deepestSinceRegen && !initialGen && y > currentMaxY)
+        {
+            currentMaxY = y;
+            MoveToSnapshot(depthIndex + 2, 2f);
+        }
     }
 
     private IEnumerator WaitForInput()
@@ -53,7 +79,6 @@ public class AudioController : MonoBehaviour
             if (audioSource != sfxSource)
                 audioSource.Play();
         }
-        PlayRandomSoundClip(testSounds);
     }
 
     public static void MoveToSnapshot(int snapshotIndex, float timeToReach)

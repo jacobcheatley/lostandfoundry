@@ -5,6 +5,9 @@ using System.Linq;
 
 public class LevelGenerator : MonoBehaviour
 {
+    public delegate void OnChunkPlacedDelegate(Vector2 chunkCentre, int x, int y, int depthIndex, bool deepestSinceRegen, bool initialGen);
+    public event OnChunkPlacedDelegate OnChunkPlaced;
+
     [SerializeField]
     private Transform levelParent;
 
@@ -16,6 +19,9 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField]
     private Transform backgroundParent;
 
+    [SerializeField]
+    private Camera camera; 
+
     private int initialChunkWidth = 3;
     private int maxChunkWidth = 20;
     private int maxDepth;
@@ -26,6 +32,8 @@ public class LevelGenerator : MonoBehaviour
     private float spotWiggle;
     private Dictionary<int, List<HookableInfo>> objectWeights;
     private static LevelGenerator instance;
+    private int currentMaxY = 0;
+    private bool[,] generatedChunks;
 
     private void Awake()
     {
@@ -69,10 +77,12 @@ public class LevelGenerator : MonoBehaviour
 
     public static void GenerateNew()
     {
+        instance.generatedChunks = new bool[2 * instance.maxChunkWidth - 1, instance.maxDepth]; // -maxChunkWidth to maxChunkWidth inclusive, 0 to maxDepth inclusive
+        instance.currentMaxY = 0;
         for (int x = -instance.initialChunkWidth; x <= instance.initialChunkWidth; x++)
         {
             for (int y = 0; y < instance.depthInfos[0].chunkEnd; y++)
-                instance.GenerateChunk(x, y);
+                instance.GenerateChunk(x, y, true);
         }
     }
 
@@ -81,15 +91,57 @@ public class LevelGenerator : MonoBehaviour
         return initialChunkOffset + new Vector2(x * chunkSpacing.x, y * chunkSpacing.y);
     }
 
-    private void GenerateChunk(int x, int y)
+    private System.Tuple<int, int> InverseChunkCentre(Vector2 chunkCentre)
     {
+        int x = (int)((chunkCentre.x - initialChunkOffset.x) / chunkSpacing.x);
+        int y = (int)((chunkCentre.y - initialChunkOffset.y) / chunkSpacing.y);
+        return new System.Tuple<int, int>(x, y);
+    }
+
+    public static void PutisSpencerHere(Vector2 origin, float radius)
+    {
+        float jumpDistance = instance.chunkSpacing.x / 2f;
+
+        float xSearch = -radius;
+        while (xSearch < radius)
+        {
+            xSearch += jumpDistance;
+            float ySearch = -radius;
+            while (ySearch < radius)
+            {
+                ySearch += jumpDistance;
+                System.Tuple<int, int> inverseCentre = instance.InverseChunkCentre(origin + new Vector2(xSearch, ySearch));
+                instance.GenerateChunk(inverseCentre.Item1, inverseCentre.Item2);
+            }
+        }
+    }
+
+    private void GenerateChunk(int x, int y, bool initial=false)
+    {
+        if (x + maxChunkWidth < 0 || x + maxChunkWidth >= generatedChunks.GetLength(0) || y < 0 || y >= generatedChunks.GetLength(1))
+            return;
+        if (generatedChunks[x + maxChunkWidth, y])
+            return;
+
+        generatedChunks[x + maxChunkWidth, y] = true;
+
         Debug.Log($"Generate {x}, {y}");
-        LevelGeneratorDepthInfo depthInfo = depthInfos.First(d => y < d.chunkEnd);
+
+        LevelGeneratorDepthInfo depthInfo = depthInfos[0];
+        int depthInfoIndex;
+        for (depthInfoIndex = 0; depthInfoIndex < depthInfos.Length; depthInfoIndex++)
+        {
+            if (y < depthInfos[depthInfoIndex].chunkEnd)
+                depthInfo = depthInfos[depthInfoIndex];
+        }
+
         List<HookableInfo> weightedHookablesThisChunk = objectWeights[depthInfo.chunkEnd];
         Vector2 chunkCentre = ChunkCentre(x, y);
-        Debug.Log(chunkCentre);
         Vector2 spotStart = chunkCentre - chunkSpacing / 2f + spotSpacing / 2f;
-        Debug.Log(spotStart);
+
+        OnChunkPlaced?.Invoke(chunkCentre, x, y, depthInfoIndex, y > currentMaxY, initial);
+        currentMaxY = y > currentMaxY ? y : currentMaxY;
+
         for (int xx = 0; xx < numSpots; xx++)
         {
             for (int yy = 0; yy < numSpots; yy++)

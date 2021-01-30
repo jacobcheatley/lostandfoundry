@@ -74,6 +74,7 @@ public class DayNightSwitcher : MonoBehaviour
         CameraControl.Follow(cameraAnchorNight, 4f);
         CameraControl.SetHeight(cameraSizeNight, 2f);
         LevelGenerator.Clear();
+        AudioController.EndDepthAudio();
     }
 
     private void DelayFunction(Action function, float waitTime)
