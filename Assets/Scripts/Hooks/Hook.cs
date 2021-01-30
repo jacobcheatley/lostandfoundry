@@ -89,6 +89,7 @@ public class Hook : Retractable
 
     [Header("Movement-related variables")]
     private bool launched = false;
+    [SerializeField]
     private Vector3 movement;
     private List<Coroutine> travellingCoroutines = new List<Coroutine>();
 
@@ -123,6 +124,8 @@ public class Hook : Retractable
         maxHookedItems = baseMaxHookedItems;
         maxLaunchCount = baseMaxLaunchCount;
         retractionRate = baseRetractionRate;
+        quantumTunnelElapsedCooldown = quantumTunnelCooldownSeconds;
+        targetedRedirectElapsedCooldown = targetedRedirectCooldownSeconds;
     }
 
     private void ApplyBasicSkills()
@@ -169,6 +172,8 @@ public class Hook : Retractable
         }
         retractionRate += totalUnlockedSkills;
     }
+
+    public List<Hookable> nearestHookables = new List<Hookable>();
 
     /// <summary>
     /// Use this for the main hook only
@@ -259,7 +264,7 @@ public class Hook : Retractable
                 .CompareTo(Vector3.Distance(transform.position, h2.transform.position))
             ));
 
-            List<Hookable> nearestHookables = new List<Hookable>();
+            nearestHookables = new List<Hookable>();
             int hookableIndex;
             // stop early if we've reached the number of hooks or the number of hookables
             for (hookableIndex = 0; hookableIndex < extraHooksPerSide * 2 && hookableIndex < unhookedHookables.Count; hookableIndex++)
@@ -270,7 +275,10 @@ public class Hook : Retractable
             // With homingExtraShots, we target the `n` nearest Hookables and aim at them.
             for (hookableIndex = 0; hookableIndex < nearestHookables.Count; hookableIndex++)
             {
-                NewChildHook(Quaternion.FromToRotation(movement, nearestHookables[hookableIndex].transform.position));
+                Vector3 from = movement;
+                Vector3 to = nearestHookables[hookableIndex].transform.position - transform.position;
+                Quaternion rotation = Quaternion.FromToRotation(from, to);
+                NewChildHook(rotation);
             }
             // for any leftovers, we alternate the side they get splayed out at
             for (; hookableIndex < extraHooksPerSide * 2; hookableIndex++)
@@ -294,6 +302,8 @@ public class Hook : Retractable
         AddRopeRendererPoint(transform.position);
 
         movement = orientation;
+        movement.z = 0;
+        movement = movement.normalized;
         launched = true;
         travellingCoroutines.Add(StartCoroutine(Travel()));
         travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(hookDurationSeconds)));
@@ -305,7 +315,8 @@ public class Hook : Retractable
     {
         if (SkillTracker.IsSkillUnlocked(SkillID.QuantumTunnel) &&
             quantumTunnelElapsedCooldown >= quantumTunnelCooldownSeconds &&
-            travelledAFrame
+            travelledAFrame &&
+            !isChild
             )
         {
             quantumTunnelElapsedCooldown = 0f;
@@ -318,7 +329,8 @@ public class Hook : Retractable
     {
         if (SkillTracker.IsSkillUnlocked(SkillID.Redirect) &&
             targetedRedirectElapsedCooldown >= targetedRedirectCooldownSeconds &&
-            travelledAFrame
+            travelledAFrame &&
+            !isChild
             )
         {
             targetedRedirectElapsedCooldown = 0;

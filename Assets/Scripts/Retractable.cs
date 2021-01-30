@@ -4,9 +4,12 @@ using UnityEngine;
 
 public abstract class Retractable : MonoBehaviour
 {
-    [HideInInspector]
+    [Header("Retract")]
     public bool isRetracting = false;
+    [SerializeField]
     protected bool temporarilyPauseRetracting = false;
+    [SerializeField]
+    private List<Vector3> retractingAlongLine;
 
     protected IEnumerator DoRetract(
         List<Vector3> alongLine, 
@@ -16,6 +19,7 @@ public abstract class Retractable : MonoBehaviour
         )
     {
         isRetracting = true;
+        retractingAlongLine = alongLine;
 
         Vector3 a = hookedItemCollisionPoint - transform.position;
         a.z = 0;
