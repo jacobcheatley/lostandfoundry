@@ -24,6 +24,8 @@ public class DayNightSwitcher : MonoBehaviour
     private Transform alien;
     [SerializeField]
     private HookLauncher hookLauncher;
+    [SerializeField]
+    private Animator alienAnimator;
 
     [Header("Properties and settings")]
     [SerializeField]
@@ -110,12 +112,14 @@ public class DayNightSwitcher : MonoBehaviour
     private IEnumerator MoveBetween(Transform obj, Transform from, Transform to, float timeFrame)
     {
         float elapsedTime = 0;
+        alienAnimator.SetBool("Walking", true);
         while (elapsedTime < timeFrame)
         {
             elapsedTime += Time.deltaTime;
             obj.position = Vector3.Lerp(from.position, to.position, Mathf.SmoothStep(0, 1, elapsedTime / timeFrame));
             yield return null;
         }
+        alienAnimator.SetBool("Walking", false);
     }
 
     public static bool IsDay()
