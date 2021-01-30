@@ -229,10 +229,11 @@ MonoBehaviour:
   hookPrefab: {fileID: 0}
   hookLauncher: {fileID: 0}
   ropeRenderer: {fileID: 5058855615198341071}
-  maxHookDurationSeconds: 2
-  speed: 4
-  maxHookedItems: 1
-  retractionRate: 12
+  baseHookDurationSeconds: 2
+  baseSpeed: 4
+  baseMaxHookedItems: 1
+  baseMaxLaunchCount: 1
+  baseRetractionRate: 3
   durationAddSecondPerLevel: 1
   speedAddPerLevel: 2
   tripleShotDegrees: 15

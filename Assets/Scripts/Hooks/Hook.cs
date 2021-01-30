@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,19 +19,21 @@ public class Hook : Retractable
 
     [Header("General Config Base Values")]
     [SerializeField]
-    private float maxHookDurationSeconds = 2f;
+    private float baseHookDurationSeconds = 2f;
     [SerializeField]
-    private float speed = 6f;
+    private float baseSpeed = 4f;
     [SerializeField]
-    private int maxHookedItems = 1;
+    private int baseMaxHookedItems = 1;
     [SerializeField]
-    private float retractionRate = 12f;
+    private int baseMaxLaunchCount = 1;
+    [SerializeField]
+    private float baseRetractionRate = 3f;
 
     [Header("Skill Specifics")]
     [SerializeField]
     private float durationAddSecondPerLevel = 1f;
     [SerializeField]
-    private float speedAddPerLevel = 6f;
+    private float speedAddPerLevel = 2f;
     [SerializeField]
     private float tripleShotDegrees = 15f;
     [SerializeField]
@@ -40,13 +41,30 @@ public class Hook : Retractable
     [SerializeField]
     private float septaShotDegrees = 15f;
 
+    [Header("Active Config Values Post-Skill")]
+    [SerializeField]
+    private float hookDurationSeconds;
+    [SerializeField]
+    private float speed;
+    [SerializeField]
+    private int maxHookedItems;
+    [SerializeField]
+    private int hookedItemsThisLaunch;
+    [SerializeField]
+    private int maxLaunchCount;
+    [SerializeField]
+    private int launchCount;
+    [SerializeField]
+    private float retractionRate;
+    
+
     [Header("Movement-related variables")]
     private bool launched = false;
     private Vector3 movement;
     private List<Coroutine> travellingCoroutines = new List<Coroutine>();
 
-    [SerializeField]
     private List<Vector3> ropeRendererPoints = new List<Vector3>();
+    private List<int> newJumpPointIndices = new List<int>(); 
 
     [Header("Hooking-related variables")]
     private List<HookedItemInfo> hookedItems = new List<HookedItemInfo>();
@@ -57,20 +75,38 @@ public class Hook : Retractable
     {
         if (!isChild)
         {
-            AddRopeRendererPoint(transform.parent.position);
+            if (transform.parent != null)
+            {
+                AddRopeRendererPoint(transform.parent.position);
+            }
+            else
+            {
+                AddRopeRendererPoint(transform.position);
+            }
             AddRopeRendererPoint(transform.position);
         }
     }
 
+    public void ResetBasicSkills()
+    {
+        hookDurationSeconds = baseHookDurationSeconds;
+        speed = baseSpeed;
+        maxHookedItems = baseMaxHookedItems;
+        maxLaunchCount = baseMaxLaunchCount;
+        retractionRate = baseRetractionRate;
+    }
+
     private void ApplyBasicSkills()
     {
+        ResetBasicSkills();
+
         new List<bool>()
         {
             SkillTracker.IsSkillUnlocked(SkillID.HookDuration1),
             SkillTracker.IsSkillUnlocked(SkillID.HookDuration2),
             SkillTracker.IsSkillUnlocked(SkillID.HookDuration3),
             SkillTracker.IsSkillUnlocked(SkillID.HookDuration4),
-        }.FindAll(u => u).ForEach(u => maxHookDurationSeconds += durationAddSecondPerLevel);
+        }.FindAll(u => u).ForEach(u => hookDurationSeconds += durationAddSecondPerLevel);
 
         new List<bool>()
         {
@@ -87,6 +123,13 @@ public class Hook : Retractable
             SkillTracker.IsSkillUnlocked(SkillID.Pierce3),
             SkillTracker.IsSkillUnlocked(SkillID.Pierce4),
         }.FindAll(u => u).ForEach(u => maxHookedItems += 1);
+
+        new List<bool>()
+        {
+            SkillTracker.IsSkillUnlocked(SkillID.LaunchAgain1),
+            SkillTracker.IsSkillUnlocked(SkillID.LaunchAgain2),
+            SkillTracker.IsSkillUnlocked(SkillID.LaunchAgain3),
+        }.FindAll(u => u).ForEach(u => maxLaunchCount += 1);
     }
 
     /// <summary>
@@ -107,12 +150,14 @@ public class Hook : Retractable
         movement = orientation.normalized;
         transform.parent = null;
         launched = true;
+        launchCount += 1;
+        hookedItemsThisLaunch = 0;
 
         // Start the behaviour coroutines:
         // Movement
         travellingCoroutines.Add(StartCoroutine(Travel()));
         // The hook can only travel for so long before it runs out of time
-        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(maxHookDurationSeconds)));
+        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(hookDurationSeconds)));
 
         // Multishot skill logic
         int extraHooksPerSide = 0;
@@ -173,7 +218,7 @@ public class Hook : Retractable
         movement = orientation;
         launched = true;
         travellingCoroutines.Add(StartCoroutine(Travel()));
-        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(maxHookDurationSeconds)));
+        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(hookDurationSeconds)));
     }
 
     private IEnumerator Travel()
@@ -182,9 +227,8 @@ public class Hook : Retractable
         while (true)
         {
             transform.position += movement * speed * Time.deltaTime;
-            if (travelledAFrame && Input.GetMouseButtonDown(0))
+            if (SkillTracker.IsSkillUnlocked(SkillID.QuantumTunnel) && travelledAFrame && Input.GetMouseButtonDown(0))
             {
-                // Quantum tunneling
                 transform.position += movement * 3f;
                 CameraControl.Follow(transform);
             }
@@ -229,6 +273,19 @@ public class Hook : Retractable
         // Regardless, all of our moving-hook-mode coroutines need to stop.
         travellingCoroutines.ForEach(StopCoroutine);
 
+        if (isChild || launchCount >= maxLaunchCount)
+        {
+            launchCount = 0;
+            BeginRetracting();
+        }
+        else
+        {
+            hookLauncher.ReDangle(fromPosition: transform.position);
+        }
+    }
+
+    public void BeginRetracting()
+    {
         // Inform each of the hooked items that they've been hooked and should begin being retracted to the colector
         hookedItems.FindAll(info => info.hookedItem == null).ForEach(info => hookedItems.Remove(info));
         hookedItems.ForEach(item => item.hookedItem.Retract(ropeRendererPoints, item, retractionRate));
@@ -256,7 +313,6 @@ public class Hook : Retractable
         currentMovingIndex = ropeRenderer.positionCount - 1;
         while (true)
         {
-            Debug.Log($"{currentMovingIndex}, {ropeRenderer.positionCount}");
             // Retract to the next point up the rope
             Vector3 target = ropeRenderer.GetPosition(currentMovingIndex - 1);
             Vector3 distanceToTarget = target - ropeRenderer.GetPosition(currentMovingIndex);
@@ -322,29 +378,35 @@ public class Hook : Retractable
             hookedItems.ForEach(info => {
                 if (info.hookedItem != null)
                 {
-                    HookedItemInfo newInfo = new HookedItemInfo()
+                    BoxCollider2D collider = info.hookedItem.GetComponent<BoxCollider2D>();
+                    // TODO: This is the wrong behaviour for the == null case
+                    // If this is null don't bother cause it's just gone I guess and it makes bugs happen
+                    if (collider != null)
                     {
-                        hookedItem = info.hookedItem,
-                        ropeRendererPointIndex = parentHook.currentMovingIndex,
-                        hookedItemCollisionPoint = info.hookedItem.GetComponent<BoxCollider2D>().ClosestPoint(parentHook.transform.position)
-                    };
+                        HookedItemInfo newInfo = new HookedItemInfo()
+                        {
+                            hookedItem = info.hookedItem,
+                            ropeRendererPointIndex = parentHook.currentMovingIndex,
+                            hookedItemCollisionPoint = collider.ClosestPoint(parentHook.transform.position)
+                        };
 
-                    parentHook.hookedItems.Add(newInfo);
+                        parentHook.hookedItems.Add(newInfo);
 
-                    info.hookedItem.Retract(
-                        parentHook.ropeRendererPoints,
-                        newInfo,
-                        retractionRate
-                    );
+                        info.hookedItem.Retract(
+                            parentHook.ropeRendererPoints,
+                            newInfo,
+                            retractionRate
+                        );
+                    }
                 }
             });
             Destroy(gameObject);
         }
         else
         {
+            // This is the parent hook, and it's now fully retracted all the way to the collector
             childHooks.FindAll(info => info.childHook == null).ForEach(info => childHooks.Remove(info));
             ropeRendererPoints.Clear();
-            // This is for when it's fully retracted all the way back to the collector
             DayNightSwitcher.instance.Night();
         }
     }
@@ -371,9 +433,12 @@ public class Hook : Retractable
             // Tell the hookable it's been hooked by us
             collision.gameObject.GetComponent<Hookable>().Hooked(this.gameObject);
 
+            hookedItemsThisLaunch += 1;
+
             // If we've reached the max hookable items, we stop
-            if (hookedItems.Count >= maxHookedItems)
+            if (hookedItemsThisLaunch >= maxHookedItems)
             {
+                // This function also handles relaunching if we still have a quota for those left.
                 StopTravelling();
             }
         }
