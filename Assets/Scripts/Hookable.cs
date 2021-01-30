@@ -5,6 +5,9 @@ using UnityEngine;
 public class Hookable : Retractable
 {
     public int value;
+    [SerializeField]
+    private bool isShipPart;
+    [HideInInspector]
     public bool isHooked = false;
 
     public void Hooked(GameObject toWhom)
@@ -21,6 +24,12 @@ public class Hookable : Retractable
         // TODO: Some more fancy animations
         AudioController.PlayRandomSoundClip(SFX.Coin);
         Destroy(gameObject);
+
+        if (isShipPart)
+        {
+            Debug.Log($"Got ship piece!");
+            ShipTracker.ShipPiecesCollected++;
+        }
     }
 
     public void Retract(List<Vector3> alongLine, HookedItemInfo info, float withSpeed)

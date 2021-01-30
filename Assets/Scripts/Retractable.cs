@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class Retractable : MonoBehaviour
 {
+    [HideInInspector]
     public bool isRetracting = false;
     protected bool temporarilyPauseRetracting = false;
 

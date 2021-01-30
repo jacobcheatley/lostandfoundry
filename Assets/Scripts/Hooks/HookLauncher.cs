@@ -83,6 +83,7 @@ public class HookLauncher : MonoBehaviour
             if (Input.GetMouseButtonDown(0) && DayNightSwitcher.IsDay())
             {
                 hook.GetComponent<Hook>().Launch();
+                AudioController.PlayRandomSoundClip(SFX.HookLaunch);
                 if (initialDangle)
                     AudioController.StartDepthAudio();
                 yield break;

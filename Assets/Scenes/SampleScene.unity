@@ -1010,6 +1010,13 @@ MonoBehaviour:
       type: 3}
   backgroundParent: {fileID: 673159293}
   camera: {fileID: 0}
+  shipPieces:
+  - {fileID: 5185249560817745881, guid: 634141c3600cf214c8e8be02f31d538f, type: 3}
+  - {fileID: 5185249560817745881, guid: ccd718c4c978a244f81196bdf4066431, type: 3}
+  - {fileID: 5185249560817745881, guid: 0fe5ecf961a6f3c4b939757dba689c53, type: 3}
+  - {fileID: 5185249560817745881, guid: 407c259ea9988254a881a5f33dfe43a5, type: 3}
+  - {fileID: 5185249560817745881, guid: cb5b854f6a84e0644ae8d949be4fd8cf, type: 3}
+  maxCentreChunkOffset: 2
 --- !u!1 &356719029
 GameObject:
   m_ObjectHideFlags: 0
@@ -1461,6 +1468,109 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 470459022}
   m_CullTransparentMesh: 0
+--- !u!1 &492326358
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 492326361}
+  - component: {fileID: 492326360}
+  - component: {fileID: 492326359}
+  m_Layer: 0
+  m_Name: BrokenShip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &492326359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 492326358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4f912522f7b7fc4b872966b4c6f8d81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 492326360}
+  stages:
+  - {fileID: 7861417073330220273, guid: 3a6877ae89c302a42b1a8d973eeac28c, type: 3}
+  - {fileID: 7940259888829098298, guid: 3a6877ae89c302a42b1a8d973eeac28c, type: 3}
+  - {fileID: -4130317775799672601, guid: 3a6877ae89c302a42b1a8d973eeac28c, type: 3}
+  - {fileID: 2951468679717357369, guid: 3a6877ae89c302a42b1a8d973eeac28c, type: 3}
+  - {fileID: 7527533081402286546, guid: 3a6877ae89c302a42b1a8d973eeac28c, type: 3}
+  - {fileID: 6549794725519490185, guid: 3a6877ae89c302a42b1a8d973eeac28c, type: 3}
+--- !u!212 &492326360
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 492326358}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 7861417073330220273, guid: 3a6877ae89c302a42b1a8d973eeac28c,
+    type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 3.998045, y: 1.6152344}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!4 &492326361
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 492326358}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -19.36209, y: -0.706129, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1878867495}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -5919,6 +6029,7 @@ Transform:
   - {fileID: 1276945696}
   - {fileID: 2082908129}
   - {fileID: 1308113884}
+  - {fileID: 492326361}
   m_Father: {fileID: 14795064}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

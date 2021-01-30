@@ -18,7 +18,14 @@ public class LevelGenerator : MonoBehaviour
     private Transform backgroundParent;
 
     [SerializeField]
-    private Camera camera; 
+    private Camera camera;
+
+    [SerializeField]
+    private GameObject[] shipPieces;
+    [SerializeField]
+    private int maxCentreChunkOffset = 2;
+    private int[] shipLocations = new int[] { 0, 1, 2, 3, 4 };
+    private int[] chosenChunk;
 
     private int initialChunkWidth = 3;
     private int maxChunkWidth = 20;
@@ -90,6 +97,14 @@ public class LevelGenerator : MonoBehaviour
 
     public static void GenerateNew()
     {
+        // Ship part location
+        int shipDepth = instance.shipLocations[ShipTracker.ShipPiecesCollected];
+        Debug.Log($"Placing at depth {shipDepth}");
+        int maxDepth = instance.depthInfos[shipDepth].chunkEnd - 1;
+        int minDepth = shipDepth == 0 ? 0 : instance.depthInfos[shipDepth - 1].chunkEnd;
+        instance.chosenChunk = new int[] { Random.Range(-instance.maxCentreChunkOffset, instance.maxCentreChunkOffset), Random.Range(minDepth, maxDepth) };
+
+        // More things
         instance.generatedChunks = new bool[2 * instance.maxChunkWidth - 1, instance.maxDepth]; // -maxChunkWidth to maxChunkWidth inclusive, 0 to maxDepth inclusive
         instance.currentMaxY = 0;
         for (int x = -instance.initialChunkWidth; x <= instance.initialChunkWidth; x++)
@@ -149,10 +164,21 @@ public class LevelGenerator : MonoBehaviour
         OnChunkPlaced?.Invoke(chunkCentre, x, y, depthInfoIndex, y > currentMaxY, initial);
         currentMaxY = y > currentMaxY ? y : currentMaxY;
 
+        bool dontCentrePlace = false;
+        if (x == chosenChunk[0] && y == chosenChunk[1])
+        {
+            dontCentrePlace = true;
+            Debug.Log($"Placing ship piece at {x}, {y}");
+            GameObject shipPiece = shipPieces[ShipTracker.ShipPiecesCollected];
+            Instantiate(shipPiece, chunkCentre, Quaternion.identity, levelParent);
+        }
+
         for (int xx = 0; xx < numSpots; xx++)
         {
             for (int yy = 0; yy < numSpots; yy++)
             {
+                if (dontCentrePlace && xx == yy && xx == numSpots / 2)
+                    continue;
                 if (Random.value <= depthInfo.density)
                 {
                     Vector2 targetLocation = spotStart + new Vector2(xx * spotSpacing.x, yy * spotSpacing.y) + Random.insideUnitCircle * spotWiggle;
