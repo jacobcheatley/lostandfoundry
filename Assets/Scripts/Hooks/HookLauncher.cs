@@ -38,24 +38,26 @@ public class HookLauncher : MonoBehaviour
         hookHook.retractCameraAnchor = retractCameraAnchor;
         hookHook.hookLauncher = this;
 
-        ReDangle();
+        Dangle();
     }
 
-    public void ReDangle()
+    public void Dangle()
     {
         ReDangle(transform.position);
     }
 
     public void ReDangle(Vector3 fromPosition)
     {
+        baseHookPivot.transform.position = fromPosition;
         hook.transform.parent = baseHookPivot.transform;
         StartCoroutine(DangleHook(fromPosition));
     }
 
     private IEnumerator DangleHook(Vector3 fromPosition)
     {
-        hookHook.BeginDangle();
         float time = 0;
+
+        hookHook.BeginDangle();
         hook.transform.localPosition = Vector3.down * dangleDistance - Vector3.forward;
         while (true)
         {
@@ -66,11 +68,11 @@ public class HookLauncher : MonoBehaviour
                 mouseWorldCoords.z = baseHookPivot.transform.position.z;
                 
                 // Look at the mouse
-                Vector3 perpendicular = transform.position - mouseWorldCoords;
+                Vector3 perpendicular = fromPosition - mouseWorldCoords;
                 Quaternion lookingAtMouse = Quaternion.LookRotation(Vector3.forward, perpendicular);
 
                 // Clamp rotation around the Z axis when looking at mouse 
-                baseHookPivot.transform.rotation = ExtraFunctions.ClampRotation(lookingAtMouse, new Vector3(180, 180, dangleAngle / 2));
+                baseHookPivot.transform.localRotation = ExtraFunctions.ClampRotation(lookingAtMouse, new Vector3(180, 180, dangleAngle / 2));
             }
             else
             {

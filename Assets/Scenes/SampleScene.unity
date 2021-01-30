@@ -784,6 +784,7 @@ MonoBehaviour:
   hookPivotPrefab: {fileID: 7084913633749815615, guid: 74529416e3966104eb461487c9a3b348,
     type: 3}
   retractCameraAnchor: {fileID: 1809683798}
+  screenCamera: {fileID: 519420031}
   dangleAngle: 90
   dangleDistance: 0.5
   dangleSpeed: 2
@@ -3547,9 +3548,8 @@ MonoBehaviour:
   - {fileID: 8723168362988533115, guid: 887a85f35a2159d458c55d6828bfcf21, type: 2}
   - {fileID: -3986538079741378904, guid: 887a85f35a2159d458c55d6828bfcf21, type: 2}
   - {fileID: -6153391296913068745, guid: 887a85f35a2159d458c55d6828bfcf21, type: 2}
-  sfxSource: {fileID: 1656642764}
-  testSounds:
-  - {fileID: 8300000, guid: 6f544d8ce150c424ea7add38c68e8153, type: 3}
+  sfxSource: {fileID: 0}
+  testSounds: []
 --- !u!82 &1656642764
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3952,6 +3952,7 @@ MonoBehaviour:
   starCanvas: {fileID: 1321611945}
   starCanvasGroup: {fileID: 1874643405}
   alien: {fileID: 1086281852}
+  hookLauncher: {fileID: 112329830}
   starFadeTime: 2
   dayBackground: {r: 0, g: 0.65882355, b: 1, a: 1}
   nightBackground: {r: 0.07058824, g: 0.07058824, b: 0.44705883, a: 1}

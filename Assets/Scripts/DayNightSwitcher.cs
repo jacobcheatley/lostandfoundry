@@ -68,7 +68,7 @@ public class DayNightSwitcher : MonoBehaviour
         AudioController.MoveToSnapshot(0, 4f);
         CameraControl.Follow(cameraAnchorDay, 4f);
         CameraControl.SetHeight(cameraSizeDay, 2f);
-        hookLauncher.ReDangle();
+        hookLauncher.Dangle();
     }
     
     public void Night()

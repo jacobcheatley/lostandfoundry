@@ -42,12 +42,19 @@ public class Hook : Retractable
     private float septaShotDegrees = 15f;
 
     [Header("Active Config Values Post-Skill")]
+    [SerializeField]
     private float hookDurationSeconds;
+    [SerializeField]
     private float speed;
+    [SerializeField]
     private int maxHookedItems;
+    [SerializeField]
     private int hookedItemsThisLaunch;
+    [SerializeField]
     private int maxLaunchCount;
+    [SerializeField]
     private int launchCount;
+    [SerializeField]
     private float retractionRate;
     
 
@@ -68,7 +75,14 @@ public class Hook : Retractable
     {
         if (!isChild)
         {
-            AddRopeRendererPoint(transform.parent.position);
+            if (transform.parent != null)
+            {
+                AddRopeRendererPoint(transform.parent.position);
+            }
+            else
+            {
+                AddRopeRendererPoint(transform.position);
+            }
             AddRopeRendererPoint(transform.position);
         }
     }
@@ -78,9 +92,7 @@ public class Hook : Retractable
         hookDurationSeconds = baseHookDurationSeconds;
         speed = baseSpeed;
         maxHookedItems = baseMaxHookedItems;
-        hookedItemsThisLaunch = 0;
         maxLaunchCount = baseMaxLaunchCount;
-        launchCount = 0;
         retractionRate = baseRetractionRate;
     }
 
@@ -138,6 +150,8 @@ public class Hook : Retractable
         movement = orientation.normalized;
         transform.parent = null;
         launched = true;
+        launchCount += 1;
+        hookedItemsThisLaunch = 0;
 
         // Start the behaviour coroutines:
         // Movement
@@ -259,6 +273,19 @@ public class Hook : Retractable
         // Regardless, all of our moving-hook-mode coroutines need to stop.
         travellingCoroutines.ForEach(StopCoroutine);
 
+        if (isChild || launchCount >= maxLaunchCount)
+        {
+            launchCount = 0;
+            BeginRetracting();
+        }
+        else
+        {
+            hookLauncher.ReDangle(fromPosition: transform.position);
+        }
+    }
+
+    public void BeginRetracting()
+    {
         // Inform each of the hooked items that they've been hooked and should begin being retracted to the colector
         hookedItems.FindAll(info => info.hookedItem == null).ForEach(info => hookedItems.Remove(info));
         hookedItems.ForEach(item => item.hookedItem.Retract(ropeRendererPoints, item, retractionRate));
@@ -351,20 +378,25 @@ public class Hook : Retractable
             hookedItems.ForEach(info => {
                 if (info.hookedItem != null)
                 {
-                    HookedItemInfo newInfo = new HookedItemInfo()
+                    BoxCollider2D collider = info.hookedItem.GetComponent<BoxCollider2D>();
+                    // If this is null don't bother cause it's just gone I guess and it makes bugs happen
+                    if (collider != null)
                     {
-                        hookedItem = info.hookedItem,
-                        ropeRendererPointIndex = parentHook.currentMovingIndex,
-                        hookedItemCollisionPoint = info.hookedItem.GetComponent<BoxCollider2D>().ClosestPoint(parentHook.transform.position)
-                    };
+                        HookedItemInfo newInfo = new HookedItemInfo()
+                        {
+                            hookedItem = info.hookedItem,
+                            ropeRendererPointIndex = parentHook.currentMovingIndex,
+                            hookedItemCollisionPoint = collider.ClosestPoint(parentHook.transform.position)
+                        };
 
-                    parentHook.hookedItems.Add(newInfo);
+                        parentHook.hookedItems.Add(newInfo);
 
-                    info.hookedItem.Retract(
-                        parentHook.ropeRendererPoints,
-                        newInfo,
-                        retractionRate
-                    );
+                        info.hookedItem.Retract(
+                            parentHook.ropeRendererPoints,
+                            newInfo,
+                            retractionRate
+                        );
+                    }
                 }
             });
             Destroy(gameObject);
@@ -405,6 +437,7 @@ public class Hook : Retractable
             // If we've reached the max hookable items, we stop
             if (hookedItemsThisLaunch >= maxHookedItems)
             {
+                // This function also handles relaunching if we still have a quota for those left.
                 StopTravelling();
             }
         }
