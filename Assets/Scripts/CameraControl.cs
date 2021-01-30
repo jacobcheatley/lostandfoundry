@@ -9,10 +9,12 @@ public class CameraControl : MonoBehaviour
 
     private static CameraControl instance;
     private bool switching = false;
+    private Camera camera;
 
     void Start()
     {
         instance = this;
+        camera = GetComponent<Camera>();
     }
 
     void Update()
@@ -21,31 +23,43 @@ public class CameraControl : MonoBehaviour
             transform.position = new Vector3(following.position.x, following.position.y, transform.position.z);
     }
 
-    public static void Follow(Transform follow, float switchSpeedFactor = 2, float delay = 0)
+    public static void Follow(Transform follow, float timeFrame = 2, float delay = 0)
     {
         instance.StopAllCoroutines();
-        instance.StartCoroutine(instance.MoveToFollowNew(follow, switchSpeedFactor, delay));
+        instance.StartCoroutine(instance.MoveToFollowNew(follow, timeFrame, delay));
     }
 
-    private IEnumerator MoveToFollowNew(Transform follow, float switchSpeedFactor, float delay)
+    public static void SetHeight(float height, float timeFrame, float delay = 0)
+    {
+        instance.StartCoroutine(instance.SetHeightCoroutine(height, timeFrame, delay));
+    }
+
+    private IEnumerator SetHeightCoroutine(float height, float timeFrame, float delay = 0)
+    {
+        yield return new WaitForSeconds(delay);
+
+        float elapsedTime = 0;
+        while (elapsedTime < timeFrame)
+        {
+            elapsedTime += Time.deltaTime;
+            camera.orthographicSize = Mathf.Lerp(instance.camera.orthographicSize, height, Mathf.SmoothStep(0, 1, elapsedTime / timeFrame));
+            yield return null;
+        }
+    }
+
+    private IEnumerator MoveToFollowNew(Transform follow, float timeFrame, float delay)
     {
         yield return new WaitForSeconds(delay);
 
         following = follow;
         switching = true;
 
-        float currentSpeed = 0;
-
-        while (true)
+        float elapsedTime = 0;
+        while (elapsedTime < timeFrame)
         {
-            Vector2 distance = following.position - transform.position;
-            if (distance.sqrMagnitude <= 0.1)
-                break;
-
-            currentSpeed += Time.deltaTime * switchSpeedFactor;
-            Vector2 travelDistance = currentSpeed * distance.normalized; // Move the distance to the target each 1/switchSpeedFactor seconds - continuously - math is fun
-
-            transform.position += new Vector3(travelDistance.x, travelDistance.y, 0);
+            elapsedTime += Time.deltaTime;
+            Vector2 newPosition = Vector2.Lerp(transform.position, follow.position, Mathf.SmoothStep(0, 1, elapsedTime / timeFrame));
+            transform.position = new Vector3(newPosition.x, newPosition.y, transform.position.z);
             yield return null;
         }
         switching = false;

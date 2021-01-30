@@ -27,9 +27,13 @@ public class DayNightSwitcher : MonoBehaviour
     [SerializeField]
     private float starFadeTime = 4f;
     [SerializeField]
+    private Color dayBackground;
+    [SerializeField]
     private Color nightBackground;
     [SerializeField]
-    private Color dayBackground;
+    private float cameraSizeDay = 7;
+    [SerializeField]
+    private float cameraSizeNight = 5;
 
     private static DayNightSwitcher instance;
     private Camera mainCamera;
@@ -60,7 +64,8 @@ public class DayNightSwitcher : MonoBehaviour
         StartCoroutine(FadeStars(false));
         StartCoroutine(MoveBetween(alien, alienAnchorNight, alienAnchorDay, 2.5f));
         AudioController.MoveToSnapshot(0, 4f);
-        CameraControl.Follow(cameraAnchorDay, 0.3f);
+        CameraControl.Follow(cameraAnchorDay, 4f);
+        CameraControl.SetHeight(cameraSizeDay, 2f);
     }
     
     public void Night()
@@ -70,7 +75,8 @@ public class DayNightSwitcher : MonoBehaviour
         StartCoroutine(FadeStars(true));
         StartCoroutine(MoveBetween(alien, alienAnchorDay, alienAnchorNight, 2.5f));
         AudioController.MoveToSnapshot(1, 4f);
-        CameraControl.Follow(cameraAnchorNight, 0.3f);
+        CameraControl.Follow(cameraAnchorNight, 4f);
+        CameraControl.SetHeight(cameraSizeNight, 2f);
     }
 
     private void DelayFunction(Action function, float waitTime)
