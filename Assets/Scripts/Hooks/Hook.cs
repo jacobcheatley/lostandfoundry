@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ public class Hook : Retractable
     [Header("GameObject References")]
     [HideInInspector]
     public GameObject retractCameraAnchor;
+    [HideInInspector]
+    public Camera mainCamera;
     [HideInInspector]
     public GameObject hookPrefab;
     [HideInInspector]
@@ -28,6 +31,10 @@ public class Hook : Retractable
     private int baseMaxLaunchCount = 1;
     [SerializeField]
     private float baseRetractionRate = 3f;
+    [SerializeField]
+    private float quantumTunnelCooldownSeconds = 2f;
+    [SerializeField]
+    private float targetedRedirectCooldownSeconds = 2f;
 
     [Header("Skill Specifics")]
     [SerializeField]
@@ -56,7 +63,29 @@ public class Hook : Retractable
     private int launchCount;
     [SerializeField]
     private float retractionRate;
-    
+    [SerializeField]
+    private float quantumTunnelElapsedCooldown = 0;
+    [SerializeField]
+    private float targetedRedirectElapsedCooldown = 0;
+
+    /// <summary>
+    /// 0 = just used it, 1 = ready
+    /// </summary>
+    public float quantumTunnelCooldownProgress
+    {
+        get
+        {
+            return Mathf.Clamp(quantumTunnelElapsedCooldown / quantumTunnelCooldownSeconds, 0, 1);
+        }
+    }
+
+    public float targetedRedirectCooldownProgress
+    {
+        get
+        {
+            return Mathf.Clamp(targetedRedirectElapsedCooldown / targetedRedirectCooldownSeconds, 0, 1);
+        }
+    }
 
     [Header("Movement-related variables")]
     private bool launched = false;
@@ -130,6 +159,15 @@ public class Hook : Retractable
             SkillTracker.IsSkillUnlocked(SkillID.LaunchAgain2),
             SkillTracker.IsSkillUnlocked(SkillID.LaunchAgain3),
         }.FindAll(u => u).ForEach(u => maxLaunchCount += 1);
+
+        int totalUnlockedSkills = 0;
+        foreach (SkillID skill in Enum.GetValues(typeof(SkillID))) {
+            if ((SkillTracker.UnlockedSkills & skill) == skill)
+            {
+                totalUnlockedSkills += 1;
+            }
+        }
+        retractionRate += totalUnlockedSkills;
     }
 
     /// <summary>
@@ -177,14 +215,9 @@ public class Hook : Retractable
             extraHooksPerSide = 1;
             separationDegrees = tripleShotDegrees;
         }
-        for (int i = -extraHooksPerSide; i <= extraHooksPerSide; i++)
-        {
-            // Don't add a new hook in the same path that we're travelling
-            if (i == 0)
-            {
-                continue;
-            }
 
+        void NewChildHook(Quaternion rotation)
+        {
             // Instantiate a copy of the hook prefab, and keep track of the new child
             GameObject newObject = Instantiate(hookPrefab, transform.position, transform.rotation);
             Hook newObjectHook = newObject.GetComponent<Hook>();
@@ -196,9 +229,56 @@ public class Hook : Retractable
             newObjectHook.parentHook = this;
 
             // Set up its scale and rotation, then tell it to start moving.
-            newObject.transform.localRotation = transform.rotation * Quaternion.Euler(0, 0, i * tripleShotDegrees);
             newObject.transform.localScale = transform.localScale * 0.5f;
-            newObjectHook.LaunchChild(Quaternion.Euler(0, 0, i * separationDegrees) * movement);
+
+            newObject.transform.localRotation = transform.rotation * rotation;
+            newObjectHook.LaunchChild(rotation * movement);
+        }
+
+
+
+        if (!SkillTracker.IsSkillUnlocked(SkillID.HomingExtraShots))
+        {
+            for (int hookIndex = -extraHooksPerSide; hookIndex <= extraHooksPerSide; hookIndex++)
+            {
+                // Don't add a new hook in the same path that we're travelling
+                if (hookIndex == 0)
+                {
+                    continue;
+                }
+                // Normally we just splay them out with `separationDegrees` between them
+                NewChildHook(Quaternion.Euler(0, 0, hookIndex * separationDegrees));
+            }
+        }
+        else
+        {
+            List<Hookable> unhookedHookables = new List<Hookable>(
+                LevelGenerator.instance.levelParent.GetComponentsInChildren<Hookable>()
+            ).FindAll(hookable => !hookable.isHooked);
+
+            unhookedHookables.Sort(Comparer<Hookable>.Create(
+                (h1, h2) => Vector3.Distance(transform.position, h1.transform.position)
+                .CompareTo(Vector3.Distance(transform.position, h2.transform.position))
+            ));
+
+            List<Hookable> nearestHookables = new List<Hookable>();
+            int hookableIndex;
+            // stop early if we've reached the number of hooks or the number of hookables
+            for (hookableIndex = 0; hookableIndex < extraHooksPerSide * 2 && hookableIndex < unhookedHookables.Count; hookableIndex++)
+            {
+                nearestHookables.Add(unhookedHookables[hookableIndex]);
+            }
+
+            // With homingExtraShots, we target the `n` nearest Hookables and aim at them.
+            for (hookableIndex = 0; hookableIndex < nearestHookables.Count; hookableIndex++)
+            {
+                NewChildHook(Quaternion.FromToRotation(movement, nearestHookables[hookableIndex].transform.position));
+            }
+            // for any leftovers, we alternate the side they get splayed out at
+            for (; hookableIndex < extraHooksPerSide * 2; hookableIndex++)
+            {
+                Debug.LogError("Ran out of hookables to target! Hopefully I can get away with not implementing this since there will always be a ton of hookables ;)");
+            }
         }
     }
 
@@ -221,17 +301,59 @@ public class Hook : Retractable
         travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(hookDurationSeconds)));
     }
 
+    private bool travelledAFrame = false;
+
+    public void DoQuantumTunnel()
+    {
+        if (SkillTracker.IsSkillUnlocked(SkillID.QuantumTunnel) &&
+            quantumTunnelElapsedCooldown >= quantumTunnelCooldownSeconds &&
+            travelledAFrame
+            )
+        {
+            quantumTunnelElapsedCooldown = 0f;
+            CameraControl.Follow(transform, timeFrame: 2f);
+            transform.position += movement * 3f;
+        }
+    }
+
+    public void DoTargetedRedirect()
+    {
+        if (SkillTracker.IsSkillUnlocked(SkillID.Redirect) &&
+            targetedRedirectElapsedCooldown >= targetedRedirectCooldownSeconds &&
+            travelledAFrame
+            )
+        {
+            targetedRedirectElapsedCooldown = 0;
+
+            // Get the mouse location
+            Vector3 mouseWorldCoords = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            mouseWorldCoords.z = transform.position.z;
+
+            // Look at the mouse
+            Vector3 perpendicular = mouseWorldCoords - transform.position;
+            Quaternion lookingAtMouse = Quaternion.LookRotation(Vector3.forward, perpendicular);
+
+            movement = perpendicular.normalized;
+            transform.localRotation = lookingAtMouse;
+            AddRopeRendererPoint(transform.position);
+        }
+    }
+
     private IEnumerator Travel()
     {
-        bool travelledAFrame = false;
+        travelledAFrame = false;
         while (true)
         {
             transform.position += movement * speed * Time.deltaTime;
-            if (SkillTracker.IsSkillUnlocked(SkillID.QuantumTunnel) && travelledAFrame && Input.GetMouseButtonDown(0))
+
+            if (Input.GetMouseButtonDown(0))
             {
-                transform.position += movement * 3f;
-                CameraControl.Follow(transform);
+                DoTargetedRedirect();
             }
+
+            quantumTunnelElapsedCooldown += Time.deltaTime;
+            targetedRedirectElapsedCooldown += Time.deltaTime;
+
             yield return null;
             travelledAFrame = true;
         }

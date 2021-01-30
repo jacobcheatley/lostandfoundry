@@ -82,13 +82,13 @@ public static class SkillTree
         { SkillID.TripleShot, new Skill(SkillID.HookSpeed1, "Triple Shot", "TODO DESC", "", 150) },
         { SkillID.PentaShot, new Skill(SkillID.TripleShot, "Penta Shot", "TODO DESC", "", 500) },
         { SkillID.SeptaShot, new Skill(SkillID.PentaShot, "Septa Shot", "TODO DESC", "", 1000) },
-        { SkillID.ValuablesRadar, new Skill(SkillID.HookDuration2, "Valuables Radar", "TODO DESC", "", 100) },
+        { SkillID.ValuablesRadar, new Skill(SkillID.HookDuration2, "Valuables Radar", "TODO DESC", "", 100) }, // UNIMPLEMENTED
         { SkillID.SlowerSwingSpeed, new Skill(SkillID.ValuablesRadar, "Slower Swing Speed", "TODO DESC", "", 100) },
         { SkillID.TargetedLaunch, new Skill(SkillID.SlowerSwingSpeed, "Targeted Launch", "TODO DESC", "", 200) },
         { SkillID.Redirect, new Skill(SkillID.ValuablesRadar, "Targeted Redirect", "TODO DESC", "", 100) },
         { SkillID.HomingExtraShots, new Skill(SkillID.HookSpeed3, "Homing Extra Shots", "TODO DESC", "", 1000) },
         { SkillID.QuantumTunnel, new Skill(SkillID.Pierce2, "Quantum Tunnel", "TODO DESC", "", 200) },
-        { SkillID.WaterImmunity, new Skill(SkillID.Pierce2, "Water Immunity", "TODO DESC", "", 300) },
-        { SkillID.MagmaImmunity, new Skill(SkillID.Pierce3, "Magma Immunity", "TODO DESC", "", 1000) }
+        { SkillID.WaterImmunity, new Skill(SkillID.Pierce2, "Water Immunity", "TODO DESC", "", 300) }, // UNIMPLEMENTED
+        { SkillID.MagmaImmunity, new Skill(SkillID.Pierce3, "Magma Immunity", "TODO DESC", "", 1000) } // UNIMPLEMENTED
     };
 }

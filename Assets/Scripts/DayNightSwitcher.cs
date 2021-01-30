@@ -40,6 +40,7 @@ public class DayNightSwitcher : MonoBehaviour
     public static DayNightSwitcher instance;
     private Camera mainCamera;
     private bool day = true;
+    public float cameraSizeDayUpgradeBonus = 0;
 
     void Start()
     {
@@ -47,7 +48,7 @@ public class DayNightSwitcher : MonoBehaviour
         mainCamera = Camera.main;
         starCanvas.SetActive(false);
         CameraControl.Follow(cameraAnchorDay, 0f);
-        CameraControl.SetHeight(cameraSizeDay, 10f);
+        CameraControl.SetHeight(cameraSizeDay + cameraSizeDayUpgradeBonus, 10f);
     }
 
     public void Day()
@@ -58,7 +59,7 @@ public class DayNightSwitcher : MonoBehaviour
         StartCoroutine(MoveBetween(alien, alienAnchorNight, alienAnchorDay, 2.5f));
         AudioController.MoveToSnapshot(0, 4f);
         CameraControl.Follow(cameraAnchorDay, 4f);
-        CameraControl.SetHeight(cameraSizeDay, 2f);
+        CameraControl.SetHeight(cameraSizeDay + cameraSizeDayUpgradeBonus, 2f);
         hookLauncher.Dangle();
         AudioController.PlayRandomSoundClip(SFX.Dawn);
         LevelGenerator.GenerateNew();

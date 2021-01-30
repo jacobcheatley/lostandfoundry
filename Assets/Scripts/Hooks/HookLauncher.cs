@@ -37,6 +37,7 @@ public class HookLauncher : MonoBehaviour
         hookHook.hookPrefab = hookPrefab;
         hookHook.retractCameraAnchor = retractCameraAnchor;
         hookHook.hookLauncher = this;
+        hookHook.mainCamera = screenCamera;
 
         Dangle();
     }
@@ -50,6 +51,7 @@ public class HookLauncher : MonoBehaviour
     {
         baseHookPivot.transform.position = fromPosition;
         hook.transform.parent = baseHookPivot.transform;
+        hook.transform.localRotation = Quaternion.Euler(Vector3.forward * 180);
         StartCoroutine(DangleHook(fromPosition, initialDangle));
     }
 

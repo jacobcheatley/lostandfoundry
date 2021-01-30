@@ -26,6 +26,9 @@ public class CameraControl : MonoBehaviour
     public static void Follow(Transform follow, float timeFrame = 2, float delay = 0)
     {
         instance.StopAllCoroutines();
+        // this makes the camera stop if a delay is provided, but we only do that when the
+        // hook begins retracting and it still looks good there ;)
+        instance.following = null;
         instance.StartCoroutine(instance.MoveToFollowNew(follow, timeFrame, delay));
     }
 
