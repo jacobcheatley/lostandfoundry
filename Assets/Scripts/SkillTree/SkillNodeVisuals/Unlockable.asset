@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textColor: {r: 1, g: 1, b: 1, a: 1}
   costColor: {r: 1, g: 1, b: 1, a: 1}
-  backgroundColor: {r: 1, g: 0.49803922, b: 0, a: 1}
+  backgroundColor: {r: 1, g: 1, b: 1, a: 1}
   connectionColor: {r: 1, g: 1, b: 1, a: 0.39215687}
   displayTooltip: 1
   displayCost: 1
-  glow: 1
+  glow: 0
