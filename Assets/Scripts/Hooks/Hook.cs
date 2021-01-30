@@ -11,6 +11,8 @@ public class Hook : Retractable
     [HideInInspector]
     public GameObject retractCameraAnchor;
     [HideInInspector]
+    public Camera mainCamera;
+    [HideInInspector]
     public GameObject hookPrefab;
     [HideInInspector]
     public HookLauncher hookLauncher;
@@ -30,6 +32,8 @@ public class Hook : Retractable
     private float baseRetractionRate = 3f;
     [SerializeField]
     private float quantumTunnelCooldownSeconds = 2f;
+    [SerializeField]
+    private float targetedRedirectCooldownSeconds = 2f;
 
     [Header("Skill Specifics")]
     [SerializeField]
@@ -60,6 +64,8 @@ public class Hook : Retractable
     private float retractionRate;
     [SerializeField]
     private float quantumTunnelElapsedCooldown = 0;
+    [SerializeField]
+    private float targetedRedirectElapsedCooldown = 0;
 
     /// <summary>
     /// 0 = just used it, 1 = ready
@@ -69,6 +75,14 @@ public class Hook : Retractable
         get
         {
             return Mathf.Clamp(quantumTunnelElapsedCooldown / quantumTunnelCooldownSeconds, 0, 1);
+        }
+    }
+
+    public float targetedRedirectCooldownProgress
+    {
+        get
+        {
+            return Mathf.Clamp(targetedRedirectElapsedCooldown / targetedRedirectCooldownSeconds, 0, 1);
         }
     }
 
@@ -292,6 +306,29 @@ public class Hook : Retractable
         }
     }
 
+    public void DoTargetedRedirect()
+    {
+        if (SkillTracker.IsSkillUnlocked(SkillID.Redirect) &&
+            targetedRedirectElapsedCooldown >= targetedRedirectCooldownSeconds &&
+            travelledAFrame
+            )
+        {
+            targetedRedirectElapsedCooldown = 0;
+
+            // Get the mouse location
+            Vector3 mouseWorldCoords = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            mouseWorldCoords.z = transform.position.z;
+
+            // Look at the mouse
+            Vector3 perpendicular = mouseWorldCoords - transform.position;
+            Quaternion lookingAtMouse = Quaternion.LookRotation(Vector3.forward, perpendicular);
+
+            movement = perpendicular.normalized;
+            transform.localRotation = lookingAtMouse;
+            AddRopeRendererPoint(transform.position);
+        }
+    }
+
     private IEnumerator Travel()
     {
         travelledAFrame = false;
@@ -301,10 +338,11 @@ public class Hook : Retractable
 
             if (Input.GetMouseButtonDown(0))
             {
-                DoQuantumTunnel();
+                DoTargetedRedirect();
             }
 
             quantumTunnelElapsedCooldown += Time.deltaTime;
+            targetedRedirectElapsedCooldown += Time.deltaTime;
 
             yield return null;
             travelledAFrame = true;
