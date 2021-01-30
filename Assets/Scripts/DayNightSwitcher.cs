@@ -35,7 +35,7 @@ public class DayNightSwitcher : MonoBehaviour
     [SerializeField]
     private float cameraSizeNight = 5;
 
-    private static DayNightSwitcher instance;
+    public static DayNightSwitcher instance;
     private Camera mainCamera;
     private bool day = true;
 

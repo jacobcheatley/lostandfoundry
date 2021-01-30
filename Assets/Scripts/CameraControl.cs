@@ -9,12 +9,12 @@ public class CameraControl : MonoBehaviour
 
     private static CameraControl instance;
     private bool switching = false;
-    private Camera camera;
+    private Camera myCamera;
 
     void Start()
     {
         instance = this;
-        camera = GetComponent<Camera>();
+        myCamera = GetComponent<Camera>();
     }
 
     void Update()
@@ -42,7 +42,7 @@ public class CameraControl : MonoBehaviour
         while (elapsedTime < timeFrame)
         {
             elapsedTime += Time.deltaTime;
-            camera.orthographicSize = Mathf.Lerp(instance.camera.orthographicSize, height, Mathf.SmoothStep(0, 1, elapsedTime / timeFrame));
+            myCamera.orthographicSize = Mathf.Lerp(instance.myCamera.orthographicSize, height, Mathf.SmoothStep(0, 1, elapsedTime / timeFrame));
             yield return null;
         }
     }

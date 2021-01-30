@@ -9,10 +9,12 @@ public class Hook : Retractable
     private bool isChild = false;
 
     [Header("GameObject References")]
-    [SerializeField]
-    private GameObject retractCameraAnchor;
-    [SerializeField]
-    private GameObject hookPrefab;
+    [HideInInspector]
+    public GameObject retractCameraAnchor;
+    [HideInInspector]
+    public GameObject hookPrefab;
+    [HideInInspector]
+    public HookLauncher hookLauncher;
     [SerializeField]
     private LineRenderer ropeRenderer;
 
@@ -51,11 +53,8 @@ public class Hook : Retractable
     private Hook parentHook;
     private List<ChildHookInfo> childHooks = new List<ChildHookInfo>();
 
-    private void Start()
+    public void BeginDangle()
     {
-        // We need to prime the rope renderer with a couple of initial points.
-        // The first point is at the pivot's position
-        // The second point gets dragged along with the hook as it travels.
         if (!isChild)
         {
             AddRopeRendererPoint(transform.parent.position);
@@ -65,8 +64,6 @@ public class Hook : Retractable
 
     private void ApplyBasicSkills()
     {
-        Debug.Log($"Speed is {speed}");
-
         new List<bool>()
         {
             SkillTracker.IsSkillUnlocked(SkillID.HookDuration1),
@@ -233,6 +230,7 @@ public class Hook : Retractable
         travellingCoroutines.ForEach(StopCoroutine);
 
         // Inform each of the hooked items that they've been hooked and should begin being retracted to the colector
+        hookedItems.FindAll(info => info.hookedItem == null).ForEach(info => hookedItems.Remove(info));
         hookedItems.ForEach(item => item.hookedItem.Retract(ropeRendererPoints, item, retractionRate));
 
         // Retract ourselves
@@ -258,6 +256,7 @@ public class Hook : Retractable
         currentMovingIndex = ropeRenderer.positionCount - 1;
         while (true)
         {
+            Debug.Log($"{currentMovingIndex}, {ropeRenderer.positionCount}");
             // Retract to the next point up the rope
             Vector3 target = ropeRenderer.GetPosition(currentMovingIndex - 1);
             Vector3 distanceToTarget = target - ropeRenderer.GetPosition(currentMovingIndex);
@@ -279,6 +278,7 @@ public class Hook : Retractable
 
                 // If there are any child hooks that still exist and split off at the point we're at,
                 // we need to wait for them to finish retracting
+                childHooks.FindAll(info => info.childHook == null).ForEach(info => childHooks.Remove(info));
                 if (childHooks.Find(info => info.ropeRendererIndex == currentMovingIndex) != null)
                 {
                     // Tell the main Retractable method to pause in the meantime
@@ -301,6 +301,7 @@ public class Hook : Retractable
                 if (ropeRenderer.positionCount <= 1)
                 {
                     ropeRenderer.positionCount = 0;
+                    currentMovingIndex = 0;
                     launched = false;
                     break;
                 }
@@ -338,6 +339,14 @@ public class Hook : Retractable
                 }
             });
             Destroy(gameObject);
+        }
+        else
+        {
+            childHooks.FindAll(info => info.childHook == null).ForEach(info => childHooks.Remove(info));
+            ropeRendererPoints.Clear();
+            // This is for when it's fully retracted all the way back to the collector
+            DayNightSwitcher.instance.Night();
+            hookLauncher.ReDangle(hookLauncher.transform.position);
         }
     }
 

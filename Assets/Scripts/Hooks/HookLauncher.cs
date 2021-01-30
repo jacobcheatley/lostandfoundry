@@ -6,9 +6,11 @@ public class HookLauncher : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField]
-    private GameObject hook;
+    private GameObject hookPrefab;
     [SerializeField]
-    private GameObject hookPivot;
+    private GameObject hookPivotPrefab;
+    [SerializeField]
+    private GameObject retractCameraAnchor;
 
     [Header("Configuration")]
     [SerializeField]
@@ -21,19 +23,37 @@ public class HookLauncher : MonoBehaviour
     [SerializeField]
     private float slowerDangleSpeed = 1f;
 
+    private GameObject hook;
+    private Hook hookHook;
+    private GameObject baseHookPivot;
+
     void Start()
     {
-        StartCoroutine(DangleHook());
+        baseHookPivot = Instantiate(hookPivotPrefab, this.transform);
+        hook = Instantiate(hookPrefab);
+        hookHook = hook.GetComponent<Hook>();
+        hookHook.hookPrefab = hookPrefab;
+        hookHook.retractCameraAnchor = retractCameraAnchor;
+        hookHook.hookLauncher = this;
+
+        ReDangle(transform.position);
     }
 
-    private IEnumerator DangleHook()
+    public void ReDangle(Vector3 fromPosition)
     {
+        hook.transform.parent = baseHookPivot.transform;
+        StartCoroutine(DangleHook(fromPosition));
+    }
+
+    private IEnumerator DangleHook(Vector3 fromPosition)
+    {
+        hookHook.BeginDangle();
         float time = 0;
         hook.transform.localPosition = Vector3.down * dangleDistance - Vector3.forward;
         while (true)
         {
             float dangleSpeedToUse = SkillTracker.IsSkillUnlocked(SkillID.SlowerSwingSpeed) ? slowerDangleSpeed : dangleSpeed;
-            hookPivot.transform.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(time * dangleSpeedToUse) * dangleAngle / 2);
+            baseHookPivot.transform.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(time * dangleSpeedToUse) * dangleAngle / 2);
             if (Input.GetMouseButtonDown(0) && DayNightSwitcher.IsDay())
             {
                 hook.GetComponent<Hook>().Launch();
