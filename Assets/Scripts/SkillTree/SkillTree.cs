@@ -63,8 +63,8 @@ public static class SkillTree
         { SkillID.HookDuration2, new Skill(SkillID.HookDuration1, "Hook Duration +1", "TODO DESC", "", 100) },
         { SkillID.HookDuration3, new Skill(SkillID.HookDuration2, "Hook Duration +1", "TODO DESC", "", 500) },
         { SkillID.HookDuration4, new Skill(SkillID.None, "Hook Duration +1", "TODO DESC", "", 300) },
-        { SkillID.CameraSize1, new Skill(SkillID.HookDuration2, "Camera Size +1", "TODO DESC", "", 50) }, // UNIMPLEMENTED
-        { SkillID.CameraSize2, new Skill(SkillID.HookDuration3, "Camera Size +1", "TODO DESC", "", 100) }, // UNIMPLEMENTED
+        { SkillID.CameraSize1, new Skill(SkillID.HookDuration2, "Camera Size +1", "TODO DESC", "", 50) },
+        { SkillID.CameraSize2, new Skill(SkillID.HookDuration3, "Camera Size +1", "TODO DESC", "", 100) },
         { SkillID.Value1, new Skill(SkillID.ValuablesRadar, "Value +25%", "TODO DESC", "", 150) },
         { SkillID.Value2, new Skill(SkillID.Value1, "Value +25%", "TODO DESC", "", 250) },
         { SkillID.Value3, new Skill(SkillID.None, "Value +25%", "TODO DESC", "", 250) },
@@ -86,7 +86,7 @@ public static class SkillTree
         { SkillID.SlowerSwingSpeed, new Skill(SkillID.ValuablesRadar, "Slower Swing Speed", "TODO DESC", "", 100) },
         { SkillID.TargetedLaunch, new Skill(SkillID.SlowerSwingSpeed, "Targeted Launch", "TODO DESC", "", 200) },
         { SkillID.Redirect, new Skill(SkillID.ValuablesRadar, "Targeted Redirect", "TODO DESC", "", 100) }, // UNIMPLEMENTED
-        { SkillID.HomingExtraShots, new Skill(SkillID.HookSpeed3, "Homing Extra Shots", "TODO DESC", "", 1000) }, // UNIMPLEMENTED
+        { SkillID.HomingExtraShots, new Skill(SkillID.HookSpeed3, "Homing Extra Shots", "TODO DESC", "", 1000) },
         { SkillID.QuantumTunnel, new Skill(SkillID.Pierce2, "Quantum Tunnel", "TODO DESC", "", 200) },
         { SkillID.WaterImmunity, new Skill(SkillID.Pierce2, "Water Immunity", "TODO DESC", "", 300) }, // UNIMPLEMENTED
         { SkillID.MagmaImmunity, new Skill(SkillID.Pierce3, "Magma Immunity", "TODO DESC", "", 1000) } // UNIMPLEMENTED
