@@ -26,6 +26,7 @@ public static class SkillTracker
 
     public static void UnlockSkill(SkillID skillID)
     {
+        AudioController.PlayRandomSoundClip(SFX.Unlock, volume: 0.1f);
         ResourceTracker.Money -= SkillTree.skills[skillID].cost;
         UnlockedSkills |= skillID;
     }

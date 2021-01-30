@@ -61,13 +61,13 @@ public class AudioController : MonoBehaviour
         instance.audioMixer.TransitionToSnapshots(new AudioMixerSnapshot[] { instance.snapshots[snapshotIndex] }, new float[] { 1 }, timeToReach);
     }
 
-    private static void PlayRandomSoundClip(AudioClip[] clips)
+    private static void PlayRandomSoundClip(AudioClip[] clips, float volume = 1f)
     {
-        instance.sfxSource.PlayOneShot(clips[Random.Range(0, clips.Length)]);
+        instance.sfxSource.PlayOneShot(clips[Random.Range(0, clips.Length)], volume);
     }
 
-    public static void PlayRandomSoundClip(SFX sfx)
+    public static void PlayRandomSoundClip(SFX sfx, float volume = 1f)
     {
-        PlayRandomSoundClip(instance.clipMap[sfx]);
+        PlayRandomSoundClip(instance.clipMap[sfx], volume);
     }
 }
