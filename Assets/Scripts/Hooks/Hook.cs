@@ -56,8 +56,8 @@ public class Hook : Retractable
     private Vector3 movement;
     private List<Coroutine> travellingCoroutines = new List<Coroutine>();
 
-    [SerializeField]
     private List<Vector3> ropeRendererPoints = new List<Vector3>();
+    private List<int> newJumpPointIndices = new List<int>(); 
 
     [Header("Hooking-related variables")]
     private List<HookedItemInfo> hookedItems = new List<HookedItemInfo>();
@@ -213,9 +213,8 @@ public class Hook : Retractable
         while (true)
         {
             transform.position += movement * speed * Time.deltaTime;
-            if (travelledAFrame && Input.GetMouseButtonDown(0))
+            if (SkillTracker.IsSkillUnlocked(SkillID.QuantumTunnel) && travelledAFrame && Input.GetMouseButtonDown(0))
             {
-                // Quantum tunneling
                 transform.position += movement * 3f;
                 CameraControl.Follow(transform);
             }
@@ -372,7 +371,7 @@ public class Hook : Retractable
         }
         else
         {
-            // This is for when it's fully retracted all the way back to the collector
+            // This is the parent hook, and it's now fully retracted all the way to the collector
             childHooks.FindAll(info => info.childHook == null).ForEach(info => childHooks.Remove(info));
             ropeRendererPoints.Clear();
             DayNightSwitcher.instance.Night();
