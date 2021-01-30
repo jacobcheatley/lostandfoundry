@@ -277,21 +277,31 @@ public class Hook : Retractable
         travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(hookDurationSeconds)));
     }
 
+    private bool travelledAFrame = false;
+
+    public void DoQuantumTunnel()
+    {
+        if (SkillTracker.IsSkillUnlocked(SkillID.QuantumTunnel) &&
+            quantumTunnelElapsedCooldown >= quantumTunnelCooldownSeconds &&
+            travelledAFrame
+            )
+        {
+            quantumTunnelElapsedCooldown = 0f;
+            CameraControl.Follow(transform, timeFrame: 2f);
+            transform.position += movement * 3f;
+        }
+    }
+
     private IEnumerator Travel()
     {
-        bool travelledAFrame = false;
+        travelledAFrame = false;
         while (true)
         {
             transform.position += movement * speed * Time.deltaTime;
-            if (SkillTracker.IsSkillUnlocked(SkillID.QuantumTunnel) &&
-                quantumTunnelElapsedCooldown >= quantumTunnelCooldownSeconds &&
-                travelledAFrame && 
-                Input.GetMouseButtonDown(0)
-                )
+
+            if (Input.GetMouseButtonDown(0))
             {
-                quantumTunnelElapsedCooldown = 0f;
-                CameraControl.Follow(transform, timeFrame: 2f);
-                transform.position += movement * 3f;
+                DoQuantumTunnel();
             }
 
             quantumTunnelElapsedCooldown += Time.deltaTime;
