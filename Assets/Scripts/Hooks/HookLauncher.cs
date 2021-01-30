@@ -36,6 +36,11 @@ public class HookLauncher : MonoBehaviour
         hookHook.retractCameraAnchor = retractCameraAnchor;
         hookHook.hookLauncher = this;
 
+        ReDangle();
+    }
+
+    public void ReDangle()
+    {
         ReDangle(transform.position);
     }
 

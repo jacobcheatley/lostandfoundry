@@ -298,7 +298,7 @@ public class Hook : Retractable
                 }
 
                 // If we've reached the end of the line, we're done.
-                if (ropeRenderer.positionCount <= 1)
+                if (currentMovingIndex == 0)
                 {
                     ropeRenderer.positionCount = 0;
                     currentMovingIndex = 0;
@@ -346,7 +346,6 @@ public class Hook : Retractable
             ropeRendererPoints.Clear();
             // This is for when it's fully retracted all the way back to the collector
             DayNightSwitcher.instance.Night();
-            hookLauncher.ReDangle(hookLauncher.transform.position);
         }
     }
 

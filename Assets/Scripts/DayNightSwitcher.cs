@@ -22,6 +22,8 @@ public class DayNightSwitcher : MonoBehaviour
     private CanvasGroup starCanvasGroup;
     [SerializeField]
     private Transform alien;
+    [SerializeField]
+    private HookLauncher hookLauncher;
 
     [Header("Properties and settings")]
     [SerializeField]
@@ -66,6 +68,7 @@ public class DayNightSwitcher : MonoBehaviour
         AudioController.MoveToSnapshot(0, 4f);
         CameraControl.Follow(cameraAnchorDay, 4f);
         CameraControl.SetHeight(cameraSizeDay, 2f);
+        hookLauncher.ReDangle();
     }
     
     public void Night()
