@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d7745161bd5a5c45a3024748b9dbb60, type: 3}
+  m_Name: SoundConfiguration
+  m_EditorClassIdentifier: 
+  sfxSounds:
+  - sfx: 0
+    clips:
+    - {fileID: 8300000, guid: 6f544d8ce150c424ea7add38c68e8153, type: 3}
+  - sfx: 1
+    clips:
+    - {fileID: 8300000, guid: d31d481814fc68a46bfd6040bac7d4a0, type: 3}
+  - sfx: 2
+    clips:
+    - {fileID: 8300000, guid: 2dd07a0656d08ff4c85273222e8a9108, type: 3}
+    - {fileID: 8300000, guid: f6c752f5792c74f40bdd811f05a5d8ab, type: 3}
+    - {fileID: 8300000, guid: 1924450a0b9f28549b5d82e5ecad4cc4, type: 3}
+    - {fileID: 8300000, guid: 07b786a80f0bd4c47afcba573f5bf81c, type: 3}
+    - {fileID: 8300000, guid: a5e84fc39f8b7414980cb400a462a232, type: 3}
+    - {fileID: 8300000, guid: 745b4fd6505e75346a84ff70d4e291a7, type: 3}
+    - {fileID: 8300000, guid: 378c2a40a32f77a4a893e40a79408ba6, type: 3}
+    - {fileID: 8300000, guid: 8bd0c0b62dc6fc247a12506f7b1dc182, type: 3}
+    - {fileID: 8300000, guid: 369064f3166488049bd9035c3688cff3, type: 3}
+    - {fileID: 8300000, guid: 264ace6f84037244db52993c578e1d12, type: 3}
+  - sfx: 3
+    clips:
+    - {fileID: 8300000, guid: a64c2ca1071fb7543bf763c93dc86266, type: 3}
+  - sfx: 4
+    clips:
+    - {fileID: 8300000, guid: 68d6e9f5c364b3f48b87157f8b9722de, type: 3}
+    - {fileID: 8300000, guid: b1d484e1715186c4dbd0e4727e071e76, type: 3}
+    - {fileID: 8300000, guid: 65ba73770808bc745adb3b7bee29c0b6, type: 3}
+    - {fileID: 8300000, guid: 2438de2d2bda19041b3bf314f172f08b, type: 3}
+    - {fileID: 8300000, guid: a0ee9e05722ddf940864713b5f93cdb3, type: 3}
+  - sfx: 5
+    clips:
+    - {fileID: 8300000, guid: 5c750ac8dec5b7f42b782b67a63abc5b, type: 3}
+  - sfx: 6
+    clips:
+    - {fileID: 8300000, guid: 4cce43bf56d05e344af88fc2ce9aa053, type: 3}
+  - sfx: 7
+    clips: []
+  - sfx: 8
+    clips:
+    - {fileID: 8300000, guid: 3f0f20e3145a8b141bd6ed538649d0e8, type: 3}
+  - sfx: 9
+    clips:
+    - {fileID: 8300000, guid: 3f0f20e3145a8b141bd6ed538649d0e8, type: 3}
+  - sfx: 10
+    clips:
+    - {fileID: 8300000, guid: bd77cba8eee58be4d8e504aef7a0bbd6, type: 3}

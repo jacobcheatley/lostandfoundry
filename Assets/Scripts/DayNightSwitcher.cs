@@ -46,17 +46,8 @@ public class DayNightSwitcher : MonoBehaviour
         instance = this;
         mainCamera = Camera.main;
         starCanvas.SetActive(false);
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (day)
-                Night();
-            else
-                Day();
-        }
+        CameraControl.Follow(cameraAnchorDay, 0f);
+        CameraControl.SetHeight(cameraSizeDay, 10f);
     }
 
     public void Day()
@@ -69,6 +60,7 @@ public class DayNightSwitcher : MonoBehaviour
         CameraControl.Follow(cameraAnchorDay, 4f);
         CameraControl.SetHeight(cameraSizeDay, 2f);
         hookLauncher.ReDangle();
+        AudioController.PlayRandomSoundClip(SFX.Dawn);
     }
     
     public void Night()

@@ -18,6 +18,7 @@ public class Hookable : Retractable
     public void Collected(GameObject byWhom)
     {
         // TODO: Some more fancy animations
+        AudioController.PlayRandomSoundClip(SFX.Coin);
         Destroy(gameObject);
     }
 

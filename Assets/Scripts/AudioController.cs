@@ -17,11 +17,18 @@ public class AudioController : MonoBehaviour
     [SerializeField]
     private AudioClip[] testSounds;
 
+    [SerializeField]
+    private SoundConfiguration soundConfiguration;
+
+    [SerializeField]
+    private Dictionary<SFX, AudioClip[]> clipMap;
+
     private static AudioController instance;
 
     private void Start()
     {
         instance = this;
+        clipMap = soundConfiguration.ClipMap();
         StartCoroutine(WaitForInput());
     }
 
@@ -57,5 +64,10 @@ public class AudioController : MonoBehaviour
     private static void PlayRandomSoundClip(AudioClip[] clips)
     {
         instance.sfxSource.PlayOneShot(clips[Random.Range(0, clips.Length)]);
+    }
+
+    public static void PlayRandomSoundClip(SFX sfx)
+    {
+        PlayRandomSoundClip(instance.clipMap[sfx]);
     }
 }
