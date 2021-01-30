@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -158,6 +159,15 @@ public class Hook : Retractable
             SkillTracker.IsSkillUnlocked(SkillID.LaunchAgain2),
             SkillTracker.IsSkillUnlocked(SkillID.LaunchAgain3),
         }.FindAll(u => u).ForEach(u => maxLaunchCount += 1);
+
+        int totalUnlockedSkills = 0;
+        foreach (SkillID skill in Enum.GetValues(typeof(SkillID))) {
+            if ((SkillTracker.UnlockedSkills & skill) == skill)
+            {
+                totalUnlockedSkills += 1;
+            }
+        }
+        retractionRate += totalUnlockedSkills;
     }
 
     /// <summary>
