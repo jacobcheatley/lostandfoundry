@@ -11,6 +11,8 @@ public class HookLauncher : MonoBehaviour
     private GameObject hookPivotPrefab;
     [SerializeField]
     private GameObject retractCameraAnchor;
+    [SerializeField]
+    private Camera screenCamera;
 
     [Header("Configuration")]
     [SerializeField]
@@ -57,8 +59,24 @@ public class HookLauncher : MonoBehaviour
         hook.transform.localPosition = Vector3.down * dangleDistance - Vector3.forward;
         while (true)
         {
-            float dangleSpeedToUse = SkillTracker.IsSkillUnlocked(SkillID.SlowerSwingSpeed) ? slowerDangleSpeed : dangleSpeed;
-            baseHookPivot.transform.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(time * dangleSpeedToUse) * dangleAngle / 2);
+            if (SkillTracker.IsSkillUnlocked(SkillID.TargetedLaunch))
+            {
+                // Get the mouse location
+                Vector3 mouseWorldCoords = screenCamera.ScreenToWorldPoint(Input.mousePosition);
+                mouseWorldCoords.z = baseHookPivot.transform.position.z;
+                
+                // Look at the mouse
+                Vector3 perpendicular = transform.position - mouseWorldCoords;
+                Quaternion lookingAtMouse = Quaternion.LookRotation(Vector3.forward, perpendicular);
+
+                // Clamp rotation around the Z axis when looking at mouse 
+                baseHookPivot.transform.rotation = ExtraFunctions.ClampRotation(lookingAtMouse, new Vector3(180, 180, dangleAngle / 2));
+            }
+            else
+            {
+                float dangleSpeedToUse = SkillTracker.IsSkillUnlocked(SkillID.SlowerSwingSpeed) ? slowerDangleSpeed : dangleSpeed;
+                baseHookPivot.transform.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(time * dangleSpeedToUse) * dangleAngle / 2);
+            }
             if (Input.GetMouseButtonDown(0) && DayNightSwitcher.IsDay())
             {
                 hook.GetComponent<Hook>().Launch();

@@ -256,7 +256,6 @@ public class Hook : Retractable
         currentMovingIndex = ropeRenderer.positionCount - 1;
         while (true)
         {
-            Debug.Log($"{currentMovingIndex}, {ropeRenderer.positionCount}");
             // Retract to the next point up the rope
             Vector3 target = ropeRenderer.GetPosition(currentMovingIndex - 1);
             Vector3 distanceToTarget = target - ropeRenderer.GetPosition(currentMovingIndex);
