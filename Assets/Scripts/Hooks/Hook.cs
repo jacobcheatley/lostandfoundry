@@ -28,6 +28,8 @@ public class Hook : Retractable
     private int baseMaxLaunchCount = 1;
     [SerializeField]
     private float baseRetractionRate = 3f;
+    [SerializeField]
+    private float quantumTunnelCooldownSeconds = 2f;
 
     [Header("Skill Specifics")]
     [SerializeField]
@@ -56,7 +58,19 @@ public class Hook : Retractable
     private int launchCount;
     [SerializeField]
     private float retractionRate;
-    
+    [SerializeField]
+    private float quantumTunnelElapsedCooldown = 0;
+
+    /// <summary>
+    /// 0 = just used it, 1 = ready
+    /// </summary>
+    public float quantumTunnelCooldownProgress
+    {
+        get
+        {
+            return Mathf.Clamp(quantumTunnelElapsedCooldown / quantumTunnelCooldownSeconds, 0, 1);
+        }
+    }
 
     [Header("Movement-related variables")]
     private bool launched = false;
@@ -269,11 +283,19 @@ public class Hook : Retractable
         while (true)
         {
             transform.position += movement * speed * Time.deltaTime;
-            if (SkillTracker.IsSkillUnlocked(SkillID.QuantumTunnel) && travelledAFrame && Input.GetMouseButtonDown(0))
+            if (SkillTracker.IsSkillUnlocked(SkillID.QuantumTunnel) &&
+                quantumTunnelElapsedCooldown >= quantumTunnelCooldownSeconds &&
+                travelledAFrame && 
+                Input.GetMouseButtonDown(0)
+                )
             {
+                quantumTunnelElapsedCooldown = 0f;
+                CameraControl.Follow(transform, timeFrame: 2f);
                 transform.position += movement * 3f;
-                CameraControl.Follow(transform);
             }
+
+            quantumTunnelElapsedCooldown += Time.deltaTime;
+
             yield return null;
             travelledAFrame = true;
         }
