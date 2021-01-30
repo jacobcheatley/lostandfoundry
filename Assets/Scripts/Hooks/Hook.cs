@@ -13,6 +13,8 @@ public class Hook : Retractable
     private LineRenderer ropeRenderer;
     [SerializeField]
     private GameObject retractCameraAnchor;
+    [SerializeField]
+    private GameObject hookPrefab;
 
     [Header("General Config Base Values")]
     [SerializeField]
@@ -127,8 +129,6 @@ public class Hook : Retractable
         isChild = true;
 
         ApplyBasicSkills();
-
-        maxHookDurationSeconds *= 0.75f;
 
         AddRopeRendererPoint(transform.position);
         AddRopeRendererPoint(transform.position);
@@ -302,7 +302,7 @@ public class Hook : Retractable
                 StopTravelling();
             }
             // Split3 skill logic
-            else if (SkillTracker.IsSkillUnlocked(SkillID.TripleShot))
+            else if (SkillTracker.IsSkillUnlocked(SkillID.TripleShot) && !isChild)
             {
                 for (int i = -1; i < 2; i++)
                 {
@@ -313,7 +313,7 @@ public class Hook : Retractable
                     }
 
                     // Clone ourselves and keep track of the new Hook
-                    GameObject newObject = Instantiate(gameObject);
+                    GameObject newObject = Instantiate(hookPrefab);
                     Hook newObjectHook = newObject.GetComponent<Hook>();
                     childHooks.Add(new ChildHookInfo(
                         _childHook: newObjectHook,
