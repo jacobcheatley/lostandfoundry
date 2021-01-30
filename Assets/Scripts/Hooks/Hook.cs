@@ -84,7 +84,7 @@ public class Hook : Retractable
     public void LaunchChild(Vector3 orientation)
     {
         isChild = true;
-        launchTimeoutSeconds *= 2;
+        launchTimeoutSeconds *= 0.75f;
 
         AddRopeRendererPoint(transform.position);
         AddRopeRendererPoint(transform.position);
