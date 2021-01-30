@@ -118,6 +118,28 @@ public class SkillNode : MonoBehaviour
         if (skillConnection != null)
             skillConnection.GetComponent<Image>().color = visual.connectionColor;
         costText.gameObject.SetActive(visual.displayCost);
+        if (visual.glow)
+            StartCoroutine(Glow());
+        else
+        {
+            StopAllCoroutines();
+            transform.localScale = Vector3.one;
+        }
+    }
+
+    private IEnumerator Glow()
+    {
+        float glowSpeed = Random.Range(10/7f, 14/7f);
+        float glowFactor = Random.Range(0.1f, 0.25f);
+        float baseSizeIncrease = 1.3f;
+
+        float duration = 0;
+        while (true)
+        {
+            duration += Time.deltaTime;
+            backgroundImage.transform.localScale = Vector3.one * baseSizeIncrease + Vector3.one * Mathf.Sin(duration * glowSpeed) * glowFactor;
+            yield return null;
+        }
     }
 
     public void Click()

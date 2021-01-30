@@ -10,7 +10,11 @@ public class Collector : MonoBehaviour
         {
             Hookable other = collision.GetComponent<Hookable>();
             other.Collected(gameObject);
-            ResourceTracker.Money += other.value;
+            float multiplier = 1f * 
+                (SkillTracker.IsSkillUnlocked(SkillID.Value1) ? 5f / 4 : 1) * 
+                (SkillTracker.IsSkillUnlocked(SkillID.Value2) ? 5f / 4 : 1) * 
+                (SkillTracker.IsSkillUnlocked(SkillID.Value3) ? 5f / 4 : 1);
+            ResourceTracker.Money += (int)(other.value * multiplier);
         }
     }
 }
