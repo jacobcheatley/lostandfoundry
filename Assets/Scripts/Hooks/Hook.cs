@@ -48,6 +48,7 @@ public class Hook : Retractable
 
     [Header("Hooking-related variables")]
     private List<HookedItemInfo> hookedItems = new List<HookedItemInfo>();
+    private Hook parentHook;
     private List<ChildHookInfo> childHooks = new List<ChildHookInfo>();
 
     private void Start()
@@ -104,6 +105,9 @@ public class Hook : Retractable
     /// </summary>
     public void Launch()
     {
+        SkillTracker.UnlockSkill(SkillID.TripleShot);
+        SkillTracker.UnlockSkill(SkillID.Pierce1);
+
         ApplyBasicSkills();
 
         CameraControl.Follow(transform);
@@ -207,10 +211,15 @@ public class Hook : Retractable
         }
     }
 
+    // This is the one for RetractRopeRenderer. It's class-scope so children can access it when they
+    // pass their hooked items up to us to make retraction work properly there.
+    [HideInInspector]
+    public int currentMovingIndex;
+
     private IEnumerator RetractRopeRenderer()
     {
         // Similar code to Retractable::DoRetract(), but with more logic for pausing and shit
-        int currentMovingIndex = ropeRenderer.positionCount - 1;
+        currentMovingIndex = ropeRenderer.positionCount - 1;
         while (true)
         {
             // Retract to the next point up the rope
@@ -268,8 +277,27 @@ public class Hook : Retractable
     override protected void FinishedRetracting()
     {
         isRetracting = false;
+        // If we're a child of another hook, we need to pass all the hooked items up to be owned by
+        // our parent hook. This includes giving them a new Retract call with a freshly constructed
+        // HookedItemInfo.
         if (isChild)
         {
+            hookedItems.ForEach(info => {
+                HookedItemInfo newInfo = new HookedItemInfo()
+                {
+                    hookedItem = info.hookedItem,
+                    ropeRendererPointIndex = parentHook.currentMovingIndex,
+                    hookedItemCollisionPoint = info.hookedItem.GetComponent<BoxCollider2D>().ClosestPoint(parentHook.transform.position)
+                };
+
+                parentHook.hookedItems.Add(newInfo);
+
+                info.hookedItem.Retract(
+                    parentHook.ropeRendererPoints,
+                    newInfo,
+                    retractionRate
+                );
+            });
             Destroy(gameObject);
         }
     }
@@ -319,6 +347,7 @@ public class Hook : Retractable
                         _childHook: newObjectHook,
                         _ropeRendererIndex: ropeRendererPoints.Count - 2
                     ));
+                    newObjectHook.parentHook = this;
 
                     // Set up its scale and rotation, then tell it to start moving.
                     newObject.transform.localRotation = transform.rotation * Quaternion.Euler(0, 0, i * tripleShotDegrees);
