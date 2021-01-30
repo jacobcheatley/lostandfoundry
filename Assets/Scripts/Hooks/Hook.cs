@@ -155,7 +155,7 @@ public class Hook : Retractable
 
         if (!isChild)
         {
-            CameraControl.Follow(retractCameraAnchor.transform, switchSpeedFactor: 0.5f, delay: 0.3f);
+            CameraControl.Follow(retractCameraAnchor.transform, timeFrame: 0.5f, delay: 0.3f);
         }
     }
 
