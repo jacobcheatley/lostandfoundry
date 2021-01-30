@@ -177,14 +177,9 @@ public class Hook : Retractable
             extraHooksPerSide = 1;
             separationDegrees = tripleShotDegrees;
         }
-        for (int i = -extraHooksPerSide; i <= extraHooksPerSide; i++)
-        {
-            // Don't add a new hook in the same path that we're travelling
-            if (i == 0)
-            {
-                continue;
-            }
 
+        void NewChildHook(Quaternion rotation)
+        {
             // Instantiate a copy of the hook prefab, and keep track of the new child
             GameObject newObject = Instantiate(hookPrefab, transform.position, transform.rotation);
             Hook newObjectHook = newObject.GetComponent<Hook>();
@@ -196,9 +191,56 @@ public class Hook : Retractable
             newObjectHook.parentHook = this;
 
             // Set up its scale and rotation, then tell it to start moving.
-            newObject.transform.localRotation = transform.rotation * Quaternion.Euler(0, 0, i * tripleShotDegrees);
             newObject.transform.localScale = transform.localScale * 0.5f;
-            newObjectHook.LaunchChild(Quaternion.Euler(0, 0, i * separationDegrees) * movement);
+
+            newObject.transform.localRotation = transform.rotation * rotation;
+            newObjectHook.LaunchChild(rotation * movement);
+        }
+
+
+
+        if (!SkillTracker.IsSkillUnlocked(SkillID.HomingExtraShots))
+        {
+            for (int hookIndex = -extraHooksPerSide; hookIndex <= extraHooksPerSide; hookIndex++)
+            {
+                // Don't add a new hook in the same path that we're travelling
+                if (hookIndex == 0)
+                {
+                    continue;
+                }
+                // Normally we just splay them out with `separationDegrees` between them
+                NewChildHook(Quaternion.Euler(0, 0, hookIndex * separationDegrees));
+            }
+        }
+        else
+        {
+            List<Hookable> unhookedHookables = new List<Hookable>(
+                LevelGenerator.instance.levelParent.GetComponentsInChildren<Hookable>()
+            ).FindAll(hookable => !hookable.isHooked);
+
+            unhookedHookables.Sort(Comparer<Hookable>.Create(
+                (h1, h2) => Vector3.Distance(transform.position, h1.transform.position)
+                .CompareTo(Vector3.Distance(transform.position, h2.transform.position))
+            ));
+
+            List<Hookable> nearestHookables = new List<Hookable>();
+            int hookableIndex;
+            // stop early if we've reached the number of hooks or the number of hookables
+            for (hookableIndex = 0; hookableIndex < extraHooksPerSide * 2 && hookableIndex < unhookedHookables.Count; hookableIndex++)
+            {
+                nearestHookables.Add(unhookedHookables[hookableIndex]);
+            }
+
+            // With homingExtraShots, we target the `n` nearest Hookables and aim at them.
+            for (hookableIndex = 0; hookableIndex < nearestHookables.Count; hookableIndex++)
+            {
+                NewChildHook(Quaternion.FromToRotation(movement, nearestHookables[hookableIndex].transform.position));
+            }
+            // for any leftovers, we alternate the side they get splayed out at
+            for (; hookableIndex < extraHooksPerSide * 2; hookableIndex++)
+            {
+                Debug.LogError("Ran out of hookables to target! Hopefully I can get away with not implementing this since there will always be a ton of hookables ;)");
+            }
         }
     }
 

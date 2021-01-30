@@ -8,8 +8,9 @@ public class LevelGenerator : MonoBehaviour
     public delegate void OnChunkPlacedDelegate(Vector2 chunkCentre, int x, int y, int depthIndex, bool deepestSinceRegen, bool initialGen);
     public event OnChunkPlacedDelegate OnChunkPlaced;
 
+    // Hahaha, private variables are for chumps. I just want to grab a list of all the generated objects :)
     [SerializeField]
-    private Transform levelParent;
+    public Transform levelParent;
 
     [SerializeField]
     private LevelGeneratorDepthInfo[] depthInfos;
@@ -31,7 +32,8 @@ public class LevelGenerator : MonoBehaviour
     private Vector2 spotSpacing;
     private float spotWiggle;
     private Dictionary<int, List<HookableInfo>> objectWeights;
-    private static LevelGenerator instance;
+    // What's that? Public singletons are a bad thing? But this is a game jam!
+    public static LevelGenerator instance;
     private int currentMaxY = 0;
     private bool[,] generatedChunks;
 
