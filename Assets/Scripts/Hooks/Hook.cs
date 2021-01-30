@@ -549,7 +549,8 @@ public class Hook : Retractable
     {
         // If we've hit a hookable that isn't already hooked...
         if (collision.gameObject.layer == LayerMask.NameToLayer("Hookable") &&
-            !collision.gameObject.GetComponent<Hookable>().isHooked
+            !collision.gameObject.GetComponent<Hookable>().isHooked &&
+            launched
             )
         {
             // Add it to the hooked items we keep track of
