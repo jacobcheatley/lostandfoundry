@@ -2330,7 +2330,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d983f39fffe57b940aa9764b76a32a39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isRetracting: 0
   value: 100
+  isHooked: 0
 --- !u!1 &1038930521
 GameObject:
   m_ObjectHideFlags: 0
@@ -3080,7 +3082,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d983f39fffe57b940aa9764b76a32a39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isRetracting: 0
   value: 150
+  isHooked: 0
 --- !u!61 &1309860658
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3849,12 +3853,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc940c625141b647a6c8dc199e35065, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 6
-  launchTimeoutSeconds: 2
-  maxHookedItems: 2
-  retractionRate: 3
+  isRetracting: 0
+  isChild: 0
   ropeRenderer: {fileID: 138426984}
   retractCameraAnchor: {fileID: 2118035534}
+  maxHookDurationSeconds: 2
+  speed: 6
+  maxHookedItems: 1
+  retractionRate: 3
+  durationAddSecondPerLevel: 1
+  speedAddPerLevel: 6
+  tripleShotDegrees: 15
+  pentaShotDegrees: 15
+  septaShotDegrees: 15
 --- !u!58 &1457529731
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -6111,6 +6122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e037661c2f676174ca60cc69d9177ff0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  valueMultiplierPerLevel: 1.25
 --- !u!58 &2118035537
 CircleCollider2D:
   m_ObjectHideFlags: 0

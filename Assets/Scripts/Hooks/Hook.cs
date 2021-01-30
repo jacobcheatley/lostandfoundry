@@ -5,11 +5,20 @@ using UnityEngine;
 
 public class Hook : Retractable
 {
-    [Header("Numeric Config")]
     [SerializeField]
-    private float speed = 6;
+    private bool isChild = false;
+
+    [Header("GameObject References")]
     [SerializeField]
-    private float launchTimeoutSeconds = 2f;
+    private LineRenderer ropeRenderer;
+    [SerializeField]
+    private GameObject retractCameraAnchor;
+
+    [Header("General Config Base Values")]
+    [SerializeField]
+    private float maxHookDurationSeconds = 2f;
+    [SerializeField]
+    private float speed = 6f;
     [SerializeField]
     private int maxHookedItems = 1;
     [SerializeField]
@@ -17,30 +26,30 @@ public class Hook : Retractable
 
     [Header("Skill Specifics")]
     [SerializeField]
-    private float split3Degrees = 15f;
-
-    [Header("GameObject References")]
+    private float durationAddSecondPerLevel = 1f;
     [SerializeField]
-    private LineRenderer ropeRenderer;
-    private List<Vector3> ropeRendererPoints = new List<Vector3>();
-
+    private float speedAddPerLevel = 6f;
     [SerializeField]
-    private GameObject retractCameraAnchor;
+    private float tripleShotDegrees = 15f;
+    [SerializeField]
+    private float pentaShotDegrees = 15f;
+    [SerializeField]
+    private float septaShotDegrees = 15f;
 
+    [Header("Movement-related variables")]
     private bool launched = false;
     private Vector3 movement;
+
     private List<Coroutine> travellingCoroutines = new List<Coroutine>();
 
+    private List<Vector3> ropeRendererPoints = new List<Vector3>();
+
+    [Header("Hooking-related variables")]
     private List<HookedItemInfo> hookedItems = new List<HookedItemInfo>();
     private List<ChildHookInfo> childHooks = new List<ChildHookInfo>();
 
-    [SerializeField]
-    private bool isChild = false;
-
     private void Start()
     {
-        // TODO: Set private fields for upgraded skill levels from SkillManager
-
         // We need to prime the rope renderer with a couple of initial points.
         // The second point gets dragged along with the hook as it travels.
         if (transform.parent == null)
@@ -54,11 +63,47 @@ public class Hook : Retractable
         AddRopeRendererPoint(transform.position);
     }
 
+    private void ApplyBasicSkills()
+    {
+        new List<bool>()
+        {
+            SkillTracker.IsSkillUnlocked(SkillID.HookDuration1),
+            SkillTracker.IsSkillUnlocked(SkillID.HookDuration2),
+            SkillTracker.IsSkillUnlocked(SkillID.HookDuration3),
+            SkillTracker.IsSkillUnlocked(SkillID.HookDuration4),
+        }.FindAll(u => u).ForEach(u => maxHookDurationSeconds += durationAddSecondPerLevel);
+
+        new List<bool>()
+        {
+            SkillTracker.IsSkillUnlocked(SkillID.HookSpeed1),
+            SkillTracker.IsSkillUnlocked(SkillID.HookSpeed2),
+            SkillTracker.IsSkillUnlocked(SkillID.HookSpeed3),
+            SkillTracker.IsSkillUnlocked(SkillID.HookSpeed4),
+        }.FindAll(u => u).ForEach(u => speed += speedAddPerLevel);
+
+        new List<bool>()
+        {
+            SkillTracker.IsSkillUnlocked(SkillID.Pierce1),
+            SkillTracker.IsSkillUnlocked(SkillID.Pierce2),
+            SkillTracker.IsSkillUnlocked(SkillID.Pierce3),
+            SkillTracker.IsSkillUnlocked(SkillID.Pierce4),
+        }.FindAll(u => u).ForEach(u => maxHookedItems += 1);
+
+        Debug.Log(
+            "After skills upgraded, values were as follows:" + Environment.NewLine +
+            $"Max hook duration: {maxHookDurationSeconds}" + Environment.NewLine +
+            $"Hook speed: {speed}" + Environment.NewLine +
+            $"Max pierce count: {maxHookedItems}" + Environment.NewLine
+            );
+    }
+
     /// <summary>
     /// Use this for the main hook only
     /// </summary>
     public void Launch()
     {
+        ApplyBasicSkills();
+
         CameraControl.Follow(transform);
         Vector3 orientation = transform.position - transform.parent.position;
         orientation.z = 0;
@@ -70,7 +115,7 @@ public class Hook : Retractable
         // Movement
         travellingCoroutines.Add(StartCoroutine(Travel()));
         // The hook can only travel for so long before it runs out of time
-        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(launchTimeoutSeconds)));
+        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(maxHookDurationSeconds)));
     }
 
     /// <summary>
@@ -80,7 +125,10 @@ public class Hook : Retractable
     public void LaunchChild(Vector3 orientation)
     {
         isChild = true;
-        launchTimeoutSeconds *= 0.75f;
+
+        ApplyBasicSkills();
+
+        maxHookDurationSeconds *= 0.75f;
 
         AddRopeRendererPoint(transform.position);
         AddRopeRendererPoint(transform.position);
@@ -88,7 +136,7 @@ public class Hook : Retractable
         movement = orientation;
         launched = true;
         travellingCoroutines.Add(StartCoroutine(Travel()));
-        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(launchTimeoutSeconds)));
+        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(maxHookDurationSeconds)));
     }
 
     private IEnumerator Travel()
@@ -273,9 +321,9 @@ public class Hook : Retractable
                     ));
 
                     // Set up its scale and rotation, then tell it to start moving.
-                    newObject.transform.localRotation = transform.rotation * Quaternion.Euler(0, 0, i * split3Degrees);
+                    newObject.transform.localRotation = transform.rotation * Quaternion.Euler(0, 0, i * tripleShotDegrees);
                     newObject.transform.localScale = transform.localScale * 0.5f;
-                    newObjectHook.LaunchChild(Quaternion.Euler(0, 0, i * split3Degrees) * movement);
+                    newObjectHook.LaunchChild(Quaternion.Euler(0, 0, i * tripleShotDegrees) * movement);
                 }
             }
         }
