@@ -10,11 +10,11 @@ public class Hook : Retractable
 
     [Header("GameObject References")]
     [SerializeField]
-    private LineRenderer ropeRenderer;
-    [SerializeField]
     private GameObject retractCameraAnchor;
     [SerializeField]
     private GameObject hookPrefab;
+    [SerializeField]
+    private LineRenderer ropeRenderer;
 
     [Header("General Config Base Values")]
     [SerializeField]
@@ -41,9 +41,9 @@ public class Hook : Retractable
     [Header("Movement-related variables")]
     private bool launched = false;
     private Vector3 movement;
-
     private List<Coroutine> travellingCoroutines = new List<Coroutine>();
 
+    [SerializeField]
     private List<Vector3> ropeRendererPoints = new List<Vector3>();
 
     [Header("Hooking-related variables")]
@@ -54,16 +54,13 @@ public class Hook : Retractable
     private void Start()
     {
         // We need to prime the rope renderer with a couple of initial points.
+        // The first point is at the pivot's position
         // The second point gets dragged along with the hook as it travels.
-        if (transform.parent == null)
-        {
-            AddRopeRendererPoint(transform.position);
-        }
-        else
+        if (!isChild)
         {
             AddRopeRendererPoint(transform.parent.position);
+            AddRopeRendererPoint(transform.position);
         }
-        AddRopeRendererPoint(transform.position);
     }
 
     private void ApplyBasicSkills()
@@ -91,13 +88,6 @@ public class Hook : Retractable
             SkillTracker.IsSkillUnlocked(SkillID.Pierce3),
             SkillTracker.IsSkillUnlocked(SkillID.Pierce4),
         }.FindAll(u => u).ForEach(u => maxHookedItems += 1);
-
-        Debug.Log(
-            "After skills upgraded, values were as follows:" + Environment.NewLine +
-            $"Max hook duration: {maxHookDurationSeconds}" + Environment.NewLine +
-            $"Hook speed: {speed}" + Environment.NewLine +
-            $"Max pierce count: {maxHookedItems}" + Environment.NewLine
-            );
     }
 
     /// <summary>
@@ -105,10 +95,12 @@ public class Hook : Retractable
     /// </summary>
     public void Launch()
     {
-        SkillTracker.UnlockSkill(SkillID.TripleShot);
-        SkillTracker.UnlockSkill(SkillID.Pierce1);
-
         ApplyBasicSkills();
+
+        // Leave a point behind when we launch, and correct the one that wasn't kept up to
+        // date with the LineRenderer point that got dragged along as we dangle.
+        ropeRendererPoints[ropeRendererPoints.Count - 1] = new Vector3(transform.position.x, transform.position.y);
+        AddRopeRendererPoint(transform.position);
 
         CameraControl.Follow(transform);
         Vector3 orientation = transform.position - transform.parent.position;
@@ -122,6 +114,54 @@ public class Hook : Retractable
         travellingCoroutines.Add(StartCoroutine(Travel()));
         // The hook can only travel for so long before it runs out of time
         travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(maxHookDurationSeconds)));
+
+        // Multishot skill logic
+        int extraHooksPerSide = 0;
+        float separationDegrees = 0f;
+        if (SkillTracker.IsSkillUnlocked(SkillID.SeptaShot))
+        {
+            extraHooksPerSide = 3;
+            separationDegrees = septaShotDegrees;
+        }
+        else if (SkillTracker.IsSkillUnlocked(SkillID.PentaShot))
+        {
+            extraHooksPerSide = 2;
+            separationDegrees = pentaShotDegrees;
+        }
+        else if (SkillTracker.IsSkillUnlocked(SkillID.TripleShot))
+        {
+            extraHooksPerSide = 1;
+            separationDegrees = tripleShotDegrees;
+        }
+        for (int i = -extraHooksPerSide; i <= extraHooksPerSide; i++)
+        {
+            // Don't add a new hook in the same path that we're travelling
+            if (i == 0)
+            {
+                continue;
+            }
+
+            // Instantiate a copy of the hook prefab, and keep track of the new child
+            GameObject newObject = Instantiate(hookPrefab);
+            Hook newObjectHook = newObject.GetComponent<Hook>();
+            childHooks.Add(new ChildHookInfo(
+                _childHook: newObjectHook,
+                // magic number here just makes retraction wait for the children properly
+                _ropeRendererIndex: ropeRendererPoints.Count - 2
+            ));
+            newObjectHook.parentHook = this;
+
+            // For some godforsaken reason, new instances start with copies of the ropeRenderer points that
+            // are in this parent object. Can't track down why, so I'm just gonna do the hack job and clear
+            // them post-creation.
+            newObject.GetComponentInChildren<LineRenderer>().positionCount = 0;
+            newObjectHook.ropeRendererPoints.Clear();
+
+            // Set up its scale and rotation, then tell it to start moving.
+            newObject.transform.localRotation = transform.rotation * Quaternion.Euler(0, 0, i * tripleShotDegrees);
+            newObject.transform.localScale = transform.localScale * 0.5f;
+            newObjectHook.LaunchChild(Quaternion.Euler(0, 0, i * separationDegrees) * movement);
+        }
     }
 
     /// <summary>
@@ -283,20 +323,23 @@ public class Hook : Retractable
         if (isChild)
         {
             hookedItems.ForEach(info => {
-                HookedItemInfo newInfo = new HookedItemInfo()
+                if (info.hookedItem != null)
                 {
-                    hookedItem = info.hookedItem,
-                    ropeRendererPointIndex = parentHook.currentMovingIndex,
-                    hookedItemCollisionPoint = info.hookedItem.GetComponent<BoxCollider2D>().ClosestPoint(parentHook.transform.position)
-                };
+                    HookedItemInfo newInfo = new HookedItemInfo()
+                    {
+                        hookedItem = info.hookedItem,
+                        ropeRendererPointIndex = parentHook.currentMovingIndex,
+                        hookedItemCollisionPoint = info.hookedItem.GetComponent<BoxCollider2D>().ClosestPoint(parentHook.transform.position)
+                    };
 
-                parentHook.hookedItems.Add(newInfo);
+                    parentHook.hookedItems.Add(newInfo);
 
-                info.hookedItem.Retract(
-                    parentHook.ropeRendererPoints,
-                    newInfo,
-                    retractionRate
-                );
+                    info.hookedItem.Retract(
+                        parentHook.ropeRendererPoints,
+                        newInfo,
+                        retractionRate
+                    );
+                }
             });
             Destroy(gameObject);
         }
@@ -328,32 +371,6 @@ public class Hook : Retractable
             if (hookedItems.Count >= maxHookedItems)
             {
                 StopTravelling();
-            }
-            // Split3 skill logic
-            else if (SkillTracker.IsSkillUnlocked(SkillID.TripleShot) && !isChild)
-            {
-                for (int i = -1; i < 2; i++)
-                {
-                    // Don't add a new hook in the same path that we're travelling
-                    if (i == 0)
-                    {
-                        continue;
-                    }
-
-                    // Clone ourselves and keep track of the new Hook
-                    GameObject newObject = Instantiate(hookPrefab);
-                    Hook newObjectHook = newObject.GetComponent<Hook>();
-                    childHooks.Add(new ChildHookInfo(
-                        _childHook: newObjectHook,
-                        _ropeRendererIndex: ropeRendererPoints.Count - 2
-                    ));
-                    newObjectHook.parentHook = this;
-
-                    // Set up its scale and rotation, then tell it to start moving.
-                    newObject.transform.localRotation = transform.rotation * Quaternion.Euler(0, 0, i * tripleShotDegrees);
-                    newObject.transform.localScale = transform.localScale * 0.5f;
-                    newObjectHook.LaunchChild(Quaternion.Euler(0, 0, i * tripleShotDegrees) * movement);
-                }
             }
         }
     }

@@ -785,6 +785,7 @@ MonoBehaviour:
   dangleAngle: 90
   dangleDistance: 0.5
   dangleSpeed: 2
+  slowerDangleSpeed: 1
 --- !u!1 &284057735
 GameObject:
   m_ObjectHideFlags: 0
@@ -5980,11 +5981,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 284057736}
     m_Modifications:
-    - target: {fileID: 5058855616496483877, guid: 5f6879d6d4628b842b7e7be4cd571cc2,
-        type: 3}
-      propertyPath: tripleShotDegrees
-      value: 45
-      objectReference: {fileID: 0}
     - target: {fileID: 5058855616496483877, guid: 5f6879d6d4628b842b7e7be4cd571cc2,
         type: 3}
       propertyPath: retractCameraAnchor
