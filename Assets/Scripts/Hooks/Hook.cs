@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,25 +19,37 @@ public class Hook : Retractable
 
     [Header("General Config Base Values")]
     [SerializeField]
-    private float maxHookDurationSeconds = 2f;
+    private float baseHookDurationSeconds = 2f;
     [SerializeField]
-    private float speed = 6f;
+    private float baseSpeed = 4f;
     [SerializeField]
-    private int maxHookedItems = 1;
+    private int baseMaxHookedItems = 1;
     [SerializeField]
-    private float retractionRate = 3f;
+    private int baseMaxLaunchCount = 1;
+    [SerializeField]
+    private float baseRetractionRate = 3f;
 
     [Header("Skill Specifics")]
     [SerializeField]
     private float durationAddSecondPerLevel = 1f;
     [SerializeField]
-    private float speedAddPerLevel = 6f;
+    private float speedAddPerLevel = 2f;
     [SerializeField]
     private float tripleShotDegrees = 15f;
     [SerializeField]
     private float pentaShotDegrees = 15f;
     [SerializeField]
     private float septaShotDegrees = 15f;
+
+    [Header("Active Config Values Post-Skill")]
+    private float hookDurationSeconds;
+    private float speed;
+    private int maxHookedItems;
+    private int hookedItemsThisLaunch;
+    private int maxLaunchCount;
+    private int launchCount;
+    private float retractionRate;
+    
 
     [Header("Movement-related variables")]
     private bool launched = false;
@@ -62,15 +73,28 @@ public class Hook : Retractable
         }
     }
 
+    public void ResetBasicSkills()
+    {
+        hookDurationSeconds = baseHookDurationSeconds;
+        speed = baseSpeed;
+        maxHookedItems = baseMaxHookedItems;
+        hookedItemsThisLaunch = 0;
+        maxLaunchCount = baseMaxLaunchCount;
+        launchCount = 0;
+        retractionRate = baseRetractionRate;
+    }
+
     private void ApplyBasicSkills()
     {
+        ResetBasicSkills();
+
         new List<bool>()
         {
             SkillTracker.IsSkillUnlocked(SkillID.HookDuration1),
             SkillTracker.IsSkillUnlocked(SkillID.HookDuration2),
             SkillTracker.IsSkillUnlocked(SkillID.HookDuration3),
             SkillTracker.IsSkillUnlocked(SkillID.HookDuration4),
-        }.FindAll(u => u).ForEach(u => maxHookDurationSeconds += durationAddSecondPerLevel);
+        }.FindAll(u => u).ForEach(u => hookDurationSeconds += durationAddSecondPerLevel);
 
         new List<bool>()
         {
@@ -87,6 +111,13 @@ public class Hook : Retractable
             SkillTracker.IsSkillUnlocked(SkillID.Pierce3),
             SkillTracker.IsSkillUnlocked(SkillID.Pierce4),
         }.FindAll(u => u).ForEach(u => maxHookedItems += 1);
+
+        new List<bool>()
+        {
+            SkillTracker.IsSkillUnlocked(SkillID.LaunchAgain1),
+            SkillTracker.IsSkillUnlocked(SkillID.LaunchAgain2),
+            SkillTracker.IsSkillUnlocked(SkillID.LaunchAgain3),
+        }.FindAll(u => u).ForEach(u => maxLaunchCount += 1);
     }
 
     /// <summary>
@@ -112,7 +143,7 @@ public class Hook : Retractable
         // Movement
         travellingCoroutines.Add(StartCoroutine(Travel()));
         // The hook can only travel for so long before it runs out of time
-        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(maxHookDurationSeconds)));
+        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(hookDurationSeconds)));
 
         // Multishot skill logic
         int extraHooksPerSide = 0;
@@ -173,7 +204,7 @@ public class Hook : Retractable
         movement = orientation;
         launched = true;
         travellingCoroutines.Add(StartCoroutine(Travel()));
-        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(maxHookDurationSeconds)));
+        travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(hookDurationSeconds)));
     }
 
     private IEnumerator Travel()
@@ -341,9 +372,9 @@ public class Hook : Retractable
         }
         else
         {
+            // This is for when it's fully retracted all the way back to the collector
             childHooks.FindAll(info => info.childHook == null).ForEach(info => childHooks.Remove(info));
             ropeRendererPoints.Clear();
-            // This is for when it's fully retracted all the way back to the collector
             DayNightSwitcher.instance.Night();
         }
     }
@@ -370,8 +401,10 @@ public class Hook : Retractable
             // Tell the hookable it's been hooked by us
             collision.gameObject.GetComponent<Hookable>().Hooked(this.gameObject);
 
+            hookedItemsThisLaunch += 1;
+
             // If we've reached the max hookable items, we stop
-            if (hookedItems.Count >= maxHookedItems)
+            if (hookedItemsThisLaunch >= maxHookedItems)
             {
                 StopTravelling();
             }
