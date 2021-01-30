@@ -33,6 +33,7 @@ public class HookLauncher : MonoBehaviour
     {
         baseHookPivot = Instantiate(hookPivotPrefab, this.transform);
         hook = Instantiate(hookPrefab);
+        hook.name = "Hook (PRIMARY)";
         hookHook = hook.GetComponent<Hook>();
         hookHook.hookPrefab = hookPrefab;
         hookHook.retractCameraAnchor = retractCameraAnchor;

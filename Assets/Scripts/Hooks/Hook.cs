@@ -11,7 +11,7 @@ public class Hook : Retractable
     [Header("GameObject References")]
     [HideInInspector]
     public GameObject retractCameraAnchor;
-    [HideInInspector]
+    //[HideInInspector]
     public Camera mainCamera;
     [HideInInspector]
     public GameObject hookPrefab;
@@ -231,11 +231,9 @@ public class Hook : Retractable
             // Set up its scale and rotation, then tell it to start moving.
             newObject.transform.localScale = transform.localScale * 0.5f;
 
-            newObject.transform.localRotation = transform.rotation * rotation;
+            newObject.transform.localRotation = transform.localRotation * rotation;
             newObjectHook.LaunchChild(rotation * movement);
         }
-
-
 
         if (!SkillTracker.IsSkillUnlocked(SkillID.HomingExtraShots))
         {
@@ -500,9 +498,7 @@ public class Hook : Retractable
             hookedItems.ForEach(info => {
                 if (info.hookedItem != null)
                 {
-                    BoxCollider2D collider = info.hookedItem.GetComponent<BoxCollider2D>();
-                    // TODO: This is the wrong behaviour for the == null case
-                    // If this is null don't bother cause it's just gone I guess and it makes bugs happen
+                    Collider2D collider = info.hookedItem.GetComponent<Collider2D>();
                     if (collider != null)
                     {
                         HookedItemInfo newInfo = new HookedItemInfo()
@@ -519,6 +515,10 @@ public class Hook : Retractable
                             newInfo,
                             retractionRate
                         );
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Couldn't get a collider for the hooked item we're passing up to the parent!");
                     }
                 }
             });

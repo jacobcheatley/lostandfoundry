@@ -42,6 +42,8 @@ public class LevelGenerator : MonoBehaviour
     private int currentMaxY = 0;
     private bool[,] generatedChunks;
 
+    public Vector2 valuableTargetLocation;
+
     private void Awake()
     {
         spotSpacing = chunkSpacing / numSpots;
@@ -105,6 +107,8 @@ public class LevelGenerator : MonoBehaviour
         int maxDepth = instance.depthInfos[shipDepth].chunkEnd - 1;
         int minDepth = shipDepth == 0 ? 0 : instance.depthInfos[shipDepth - 1].chunkEnd;
         instance.chosenChunk = new int[] { Random.Range(-instance.maxCentreChunkOffset, instance.maxCentreChunkOffset), Random.Range(minDepth, maxDepth) };
+
+        instance.valuableTargetLocation = instance.ChunkCentre(instance.chosenChunk[0], instance.chosenChunk[1]);
 
         // More things
         instance.generatedChunks = new bool[2 * instance.maxChunkWidth - 1, instance.maxDepth]; // -maxChunkWidth to maxChunkWidth inclusive, 0 to maxDepth inclusive
