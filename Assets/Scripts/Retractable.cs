@@ -5,6 +5,7 @@ using UnityEngine;
 public abstract class Retractable : MonoBehaviour
 {
     public bool isRetracting = false;
+    protected bool temporarilyPauseRetracting = false;
 
     protected IEnumerator DoRetract(
         List<Vector3> alongLine, 
@@ -21,24 +22,31 @@ public abstract class Retractable : MonoBehaviour
         int currentTargetIndex = ropeRendererPointIndex;
         while (true)
         {
-            Vector3 target = alongLine[currentTargetIndex];
-            target.z = transform.position.z;
-
-            Vector3 distanceToTarget = target - (transform.position + a);
-            transform.position += distanceToTarget.normalized * withSpeed * Time.deltaTime;
-
-            // If we're close to the target
-            if (distanceToTarget.sqrMagnitude <= (withSpeed * Time.deltaTime) * (withSpeed * Time.deltaTime))
+            if (temporarilyPauseRetracting)
             {
-                // Switch target
-                currentTargetIndex -= 1;
-                if (currentTargetIndex < 0)
-                {
-                    break;
-                }
+                yield return null;
             }
+            else
+            {
+                Vector3 target = alongLine[currentTargetIndex];
+                target.z = transform.position.z;
 
-            yield return null;
+                Vector3 distanceToTarget = target - (transform.position + a);
+                transform.position += distanceToTarget.normalized * withSpeed * Time.deltaTime;
+
+                // If we're close to the target
+                if (distanceToTarget.sqrMagnitude <= (withSpeed * Time.deltaTime) * (withSpeed * Time.deltaTime))
+                {
+                    // Switch target
+                    currentTargetIndex -= 1;
+                    if (currentTargetIndex < 0)
+                    {
+                        break;
+                    }
+                }
+
+                yield return null;
+            }
         }
         FinishedRetracting();
     }

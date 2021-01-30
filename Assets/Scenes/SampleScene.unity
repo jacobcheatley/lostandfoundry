@@ -1564,7 +1564,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d983f39fffe57b940aa9764b76a32a39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isRetracting: 0
   value: 100
+  isHooked: 0
 --- !u!1 &1038930521
 GameObject:
   m_ObjectHideFlags: 0
@@ -2021,7 +2023,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1309860655}
   m_LocalRotation: {x: -0, y: -0, z: 0.32532054, w: 0.94560385}
-  m_LocalPosition: {x: -1.69, y: -3.57, z: 0}
+  m_LocalPosition: {x: 6.14, y: -0.32, z: 0}
   m_LocalScale: {x: 3.5500002, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1833170750}
@@ -2039,7 +2041,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d983f39fffe57b940aa9764b76a32a39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isRetracting: 0
   value: 150
+  isHooked: 0
 --- !u!61 &1309860658
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2586,12 +2590,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc940c625141b647a6c8dc199e35065, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isRetracting: 0
   speed: 6
   launchTimeoutSeconds: 2
   maxHookedItems: 2
   retractionRate: 3
+  split3Degrees: 15
   ropeRenderer: {fileID: 138426984}
   retractCameraAnchor: {fileID: 2118035534}
+  isChild: 0
 --- !u!58 &1457529731
 CircleCollider2D:
   m_ObjectHideFlags: 0

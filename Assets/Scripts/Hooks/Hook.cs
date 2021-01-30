@@ -32,9 +32,10 @@ public class Hook : Retractable
     private List<Coroutine> travellingCoroutines = new List<Coroutine>();
 
     private List<HookedItemInfo> hookedItems = new List<HookedItemInfo>();
-    private List<Hook> childHooks = new List<Hook>();
+    private List<ChildHookInfo> childHooks = new List<ChildHookInfo>();
 
-    private bool shouldDestroyOnRetractFinished = false;
+    [SerializeField]
+    private bool isChild = false;
 
     private void Start()
     {
@@ -57,6 +58,9 @@ public class Hook : Retractable
         AddRopeRendererPoint(transform.position);
     }
 
+    /// <summary>
+    /// Use this for the main hook only
+    /// </summary>
     public void Launch()
     {
         CameraControl.Follow(transform);
@@ -73,9 +77,14 @@ public class Hook : Retractable
         travellingCoroutines.Add(StartCoroutine(StopTravellingAfter(launchTimeoutSeconds)));
     }
 
+    /// <summary>
+    /// Use this for child hooks only.
+    /// </summary>
+    /// <param name="orientation">The direction the hook should travel in</param>
     public void LaunchChild(Vector3 orientation)
     {
-        shouldDestroyOnRetractFinished = true;
+        isChild = true;
+        launchTimeoutSeconds *= 2;
 
         AddRopeRendererPoint(transform.position);
         AddRopeRendererPoint(transform.position);
@@ -144,30 +153,62 @@ public class Hook : Retractable
 
         // Retract ourselves
         StartCoroutine(DoRetract(ropeRendererPoints, transform.position, ropeRendererPoints.Count - 1, retractionRate));
+        // Retract rope renderer handles pausing when we need to wait for children to retract
+        // This is gross I know but it's fine, don't worry
         StartCoroutine(RetractRopeRenderer());
 
-        CameraControl.Follow(retractCameraAnchor.transform, switchSpeedFactor: 0.5f, delay: 0.3f);
+        if (!isChild)
+        {
+            CameraControl.Follow(retractCameraAnchor.transform, switchSpeedFactor: 0.5f, delay: 0.3f);
+        }
     }
 
     private IEnumerator RetractRopeRenderer()
     {
-        // Similar code to Retractable::DoRetract()
+        // Similar code to Retractable::DoRetract(), but with more logic for pausing and shit
         int currentMovingIndex = ropeRenderer.positionCount - 1;
         while (true)
         {
+            // Retract to the next point up the rope
             Vector3 target = ropeRenderer.GetPosition(currentMovingIndex - 1);
             Vector3 distanceToTarget = target - ropeRenderer.GetPosition(currentMovingIndex);
 
+            // Move the last rope segment so it stays with us as we move
             ropeRenderer.SetPosition(
                 currentMovingIndex,
-                ropeRenderer.GetPosition(currentMovingIndex) + 
+                ropeRenderer.GetPosition(currentMovingIndex) +
                     (distanceToTarget.normalized * retractionRate * Time.deltaTime)
                 );
 
+            // If we've reached the target rope segment...
             if (distanceToTarget.sqrMagnitude <= (retractionRate * Time.deltaTime) * (retractionRate * Time.deltaTime))
             {
+                // Start moving towards the next segment
                 currentMovingIndex -= 1;
+                // And remove the segment we were just using
                 ropeRenderer.positionCount -= 1;
+
+                // If there are any child hooks that still exist and split off at the point we're at,
+                // we need to wait for them to finish retracting
+                if (childHooks.Find(info => info.ropeRendererIndex == currentMovingIndex) != null)
+                {
+                    // Tell the main Retractable method to pause in the meantime
+                    temporarilyPauseRetracting = true;
+                    while (true)
+                    {
+                        // Remove references to any child hooks that have killed themselves by retracting fully
+                        childHooks.FindAll(info => info.childHook == null).ForEach(info => childHooks.Remove(info));
+                        // If there are none left that split off at this point, then we're done and we can continue.
+                        if (childHooks.Find(info => info.ropeRendererIndex == currentMovingIndex) == null)
+                        {
+                            temporarilyPauseRetracting = false;
+                            break;
+                        }
+                        yield return null;
+                    }
+                }
+
+                // If we've reached the end of the line, we're done.
                 if (ropeRenderer.positionCount <= 1)
                 {
                     ropeRenderer.positionCount = 0;
@@ -182,34 +223,21 @@ public class Hook : Retractable
 
     override protected void FinishedRetracting()
     {
-        StartCoroutine(WaitForAllChildrenToRetract());
-    }
-
-    private IEnumerator WaitForAllChildrenToRetract()
-    {
-        while (true)
+        isRetracting = false;
+        if (isChild)
         {
-            if (childHooks.TrueForAll(hook => !hook.isRetracting))
-            {
-                isRetracting = false;
-                if (shouldDestroyOnRetractFinished)
-                {
-                    Destroy(gameObject);
-                }
-            }
-            else
-            {
-                yield return null;
-            }
+            Destroy(gameObject);
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // If we've hit a hookable that isn't already hooked...
         if (collision.gameObject.layer == LayerMask.NameToLayer("Hookable") &&
             !collision.gameObject.GetComponent<Hookable>().isHooked
             )
         {
+            // Add it to the hooked items we keep track of
             hookedItems.Add(
                 new HookedItemInfo() { 
                     hookedItem = collision.gameObject.GetComponent<Hookable>(),
@@ -218,28 +246,37 @@ public class Hook : Retractable
                     }
                 );
 
-            // Add a new point to the rope renderer, in case of future rope-bending upgrades.
+            // Add a new point to the rope renderer
             AddRopeRendererPoint(transform.position);
 
+            // Tell the hookable it's been hooked by us
             collision.gameObject.GetComponent<Hookable>().Hooked(this.gameObject);
 
-            // Stop condition
+            // If we've reached the max hookable items, we stop
             if (hookedItems.Count >= maxHookedItems)
             {
                 StopTravelling();
             }
+            // Split3 skill logic
             else if (SkillTracker.IsSkillUnlocked(SkillID.Split3))
             {
                 for (int i = -1; i < 2; i++)
                 {
+                    // Don't add a new hook in the same path that we're travelling
                     if (i == 0)
                     {
                         continue;
                     }
+
+                    // Clone ourselves and keep track of the new Hook
                     GameObject newObject = Instantiate(gameObject);
                     Hook newObjectHook = newObject.GetComponent<Hook>();
-                    childHooks.Add(newObjectHook);
+                    childHooks.Add(new ChildHookInfo(
+                        _childHook: newObjectHook,
+                        _ropeRendererIndex: ropeRendererPoints.Count - 2
+                    ));
 
+                    // Set up its scale and rotation, then tell it to start moving.
                     newObject.transform.localRotation = transform.rotation * Quaternion.Euler(0, 0, i * split3Degrees);
                     newObject.transform.localScale = transform.localScale * 0.5f;
                     newObjectHook.LaunchChild(Quaternion.Euler(0, 0, i * split3Degrees) * movement);
