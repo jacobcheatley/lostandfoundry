@@ -26,6 +26,10 @@ public class DayNightSwitcher : MonoBehaviour
     private HookLauncher hookLauncher;
     [SerializeField]
     private Animator alienAnimator;
+    [SerializeField]
+    private SpriteRenderer darkness;
+    [SerializeField]
+    private Animator hammerAnimator;
 
     [Header("Properties and settings")]
     [SerializeField]
@@ -38,6 +42,10 @@ public class DayNightSwitcher : MonoBehaviour
     private float cameraSizeDay = 7;
     [SerializeField]
     private float cameraSizeNight = 5;
+    [SerializeField]
+    private Color dayDarknessColor;
+    [SerializeField]
+    private Color nightDarknessColor;
 
     public static DayNightSwitcher instance;
     private Camera mainCamera;
@@ -65,6 +73,8 @@ public class DayNightSwitcher : MonoBehaviour
         hookLauncher.Dangle();
         AudioController.PlayRandomSoundClip(SFX.Dawn);
         LevelGenerator.GenerateNew();
+        StopCoroutine("StartHammer");
+        StopHammer();
     }
     
     public void Night()
@@ -72,6 +82,7 @@ public class DayNightSwitcher : MonoBehaviour
         AudioController.EndDepthAudio();
         day = false;
         Debug.Log("Night");
+        StartCoroutine(StartHammer(0.25f, 3f));
         StartCoroutine(FadeStars(true));
         StartCoroutine(MoveBetween(alien, alienAnchorDay, alienAnchorNight, 2.5f));
         AudioController.MoveToSnapshot(1, 4f);
@@ -103,6 +114,7 @@ public class DayNightSwitcher : MonoBehaviour
             fraction = visible ? fraction : 1 - fraction;
             starCanvasGroup.alpha = fraction;
             mainCamera.backgroundColor = Color.Lerp(dayBackground, nightBackground, fraction);
+            darkness.color = Color.Lerp(dayDarknessColor, nightDarknessColor, fraction);
             yield return null;
         }
         starCanvasGroup.alpha = visible ? 1 : 0;
@@ -120,6 +132,18 @@ public class DayNightSwitcher : MonoBehaviour
             yield return null;
         }
         alienAnimator.SetBool("Walking", false);
+    }
+
+    private IEnumerator StartHammer(float speed, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        hammerAnimator.SetFloat("HammerSpeed", speed);
+    }
+
+    private void StopHammer()
+    {
+        hammerAnimator.SetFloat("HammerSpeed", 0);
     }
 
     public static bool IsDay()

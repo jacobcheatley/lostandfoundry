@@ -32,7 +32,7 @@ public class LevelGenerator : MonoBehaviour
     private int maxChunkWidth = 20;
     private int maxDepth;
     private Vector2 chunkSpacing = new Vector2(10, -10);
-    private Vector2 initialChunkOffset = new Vector2(0, -6.5f);
+    private Vector2 initialChunkOffset = new Vector2(0, -6.75f);
     private int numSpots = 3;
     private Vector2 spotSpacing;
     private float spotWiggle;
