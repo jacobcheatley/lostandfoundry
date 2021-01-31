@@ -8,7 +8,7 @@ public class MoneyGUI : MonoBehaviour
 
     void Start()
     {
-        moneyText.text = $"${ResourceTracker.Money}";
-        ResourceTracker.OnMoneyChange += (_, newMoney) => moneyText.text = $"${newMoney}";
+        moneyText.text = $"{ResourceTracker.Money}";
+        ResourceTracker.OnMoneyChange += (_, newMoney) => moneyText.text = $"{newMoney}";
     }
 }

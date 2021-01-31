@@ -68,6 +68,11 @@ public class Hook : Retractable
     [SerializeField]
     private float targetedRedirectElapsedCooldown = 0;
 
+    public delegate void OnFinishedRetractingDelegate();
+    public event OnFinishedRetractingDelegate OnFinishedRetracting;
+    public delegate void OnRedirectDelegate();
+    public event OnRedirectDelegate OnRedirect;
+
     /// <summary>
     /// 0 = just used it, 1 = ready
     /// </summary>
@@ -332,11 +337,20 @@ public class Hook : Retractable
             !isChild
             )
         {
-            targetedRedirectElapsedCooldown = 0;
-
             // Get the mouse location
             Vector3 mouseWorldCoords = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             mouseWorldCoords.z = transform.position.z;
+
+            // TODO: Janky AF
+            if (SkillTracker.IsSkillUnlocked(SkillID.QuantumTunnel))
+            {
+                if (Input.mousePosition.x / Screen.width > (1280-120)/1280f && Input.mousePosition.y / Screen.height < 120/720f)
+                {
+                    return;
+                }
+            }
+
+            targetedRedirectElapsedCooldown = 0;
 
             // Look at the mouse
             Vector3 perpendicular = mouseWorldCoords - transform.position;
@@ -346,6 +360,7 @@ public class Hook : Retractable
             transform.localRotation = lookingAtMouse;
             AddRopeRendererPoint(transform.position);
             AddRopeRendererPoint(transform.position);
+            OnRedirect?.Invoke();
         }
     }
 
@@ -543,6 +558,7 @@ public class Hook : Retractable
             childHooks.FindAll(info => info.childHook == null).ForEach(info => childHooks.Remove(info));
             ropeRendererPoints.Clear();
             DayNightSwitcher.instance.Night();
+            OnFinishedRetracting?.Invoke();
         }
     }
 

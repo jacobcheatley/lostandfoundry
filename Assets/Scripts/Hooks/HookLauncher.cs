@@ -29,6 +29,8 @@ public class HookLauncher : MonoBehaviour
     private Hook hookHook;
     private GameObject baseHookPivot;
 
+    public static Hook primaryHook;
+
     void Start()
     {
         baseHookPivot = Instantiate(hookPivotPrefab, this.transform);
@@ -39,7 +41,7 @@ public class HookLauncher : MonoBehaviour
         hookHook.retractCameraAnchor = retractCameraAnchor;
         hookHook.hookLauncher = this;
         hookHook.mainCamera = screenCamera;
-
+        primaryHook = hookHook;
         Dangle();
     }
 
