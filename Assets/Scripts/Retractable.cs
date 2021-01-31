@@ -19,7 +19,10 @@ public abstract class Retractable : MonoBehaviour
         )
     {
         isRetracting = true;
-        retractingAlongLine = alongLine;
+        for (int i = 0; i < alongLine.Count; i++)
+        {
+            retractingAlongLine.Add(new Vector3(alongLine[i].x, alongLine[i].y, alongLine[i].z));
+        }
 
         Vector3 a = hookedItemCollisionPoint - transform.position;
         a.z = 0;
