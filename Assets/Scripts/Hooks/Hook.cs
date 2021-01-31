@@ -11,7 +11,7 @@ public class Hook : Retractable
     [Header("GameObject References")]
     [HideInInspector]
     public GameObject retractCameraAnchor;
-    //[HideInInspector]
+    [HideInInspector]
     public Camera mainCamera;
     [HideInInspector]
     public GameObject hookPrefab;
@@ -94,7 +94,6 @@ public class Hook : Retractable
     private List<Coroutine> travellingCoroutines = new List<Coroutine>();
 
     private List<Vector3> ropeRendererPoints = new List<Vector3>();
-    private List<int> newJumpPointIndices = new List<int>(); 
 
     [Header("Hooking-related variables")]
     private List<HookedItemInfo> hookedItems = new List<HookedItemInfo>();
@@ -346,6 +345,7 @@ public class Hook : Retractable
             movement = perpendicular.normalized;
             transform.localRotation = lookingAtMouse;
             AddRopeRendererPoint(transform.position);
+            AddRopeRendererPoint(transform.position);
         }
     }
 
@@ -404,6 +404,7 @@ public class Hook : Retractable
         // We might stop travelling for one of several reasons - timeout, hooked too much, etc.
         // Regardless, all of our moving-hook-mode coroutines need to stop.
         travellingCoroutines.ForEach(StopCoroutine);
+        launched = false;
 
         if (isChild || launchCount >= maxLaunchCount)
         {
@@ -456,8 +457,8 @@ public class Hook : Retractable
                     (distanceToTarget.normalized * retractionRate * Time.deltaTime)
                 );
 
-            // If we've reached the target rope segment...
-            if (distanceToTarget.sqrMagnitude <= (retractionRate * Time.deltaTime) * (retractionRate * Time.deltaTime))
+            // If we've reached the target rope segment... (with some tolerance)
+            if (distanceToTarget.sqrMagnitude * distanceToTarget.sqrMagnitude <= (retractionRate * Time.deltaTime) * (retractionRate * Time.deltaTime))
             {
                 // Start moving towards the next segment
                 currentMovingIndex -= 1;
@@ -549,7 +550,8 @@ public class Hook : Retractable
     {
         // If we've hit a hookable that isn't already hooked...
         if (collision.gameObject.layer == LayerMask.NameToLayer("Hookable") &&
-            !collision.gameObject.GetComponent<Hookable>().isHooked
+            !collision.gameObject.GetComponent<Hookable>().isHooked &&
+            launched
             )
         {
             // Add it to the hooked items we keep track of
