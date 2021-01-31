@@ -11,7 +11,7 @@ public class Hook : Retractable
     [Header("GameObject References")]
     [HideInInspector]
     public GameObject retractCameraAnchor;
-    //[HideInInspector]
+    [HideInInspector]
     public Camera mainCamera;
     [HideInInspector]
     public GameObject hookPrefab;
@@ -94,7 +94,6 @@ public class Hook : Retractable
     private List<Coroutine> travellingCoroutines = new List<Coroutine>();
 
     private List<Vector3> ropeRendererPoints = new List<Vector3>();
-    private List<int> newJumpPointIndices = new List<int>(); 
 
     [Header("Hooking-related variables")]
     private List<HookedItemInfo> hookedItems = new List<HookedItemInfo>();
