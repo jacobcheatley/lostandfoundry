@@ -23,6 +23,9 @@ public class Collector : MonoBehaviour
             }.FindAll(u => u).ForEach(u => value *= valueMultiplierPerLevel);
 
             ResourceTracker.Money += (int)value;
+
+            if (other.isShipPart)
+                AudioController.PlayRandomSoundClip(SFX.Happy, 0.2f);
         }
     }
 }

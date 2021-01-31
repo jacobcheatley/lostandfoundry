@@ -7,6 +7,8 @@
 Global Game Jam 2021 - University of Waikato Digital Site
 
 Staff:
+
 - [Jacob Cheatley](https://github.com/jacobcheatley)
 - [Daniel Oosterwijk](https://github.com/danoost)
 - Kelsey Bouman
+- Richard Melchert

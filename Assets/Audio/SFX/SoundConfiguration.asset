@@ -71,3 +71,11 @@ MonoBehaviour:
   - sfx: 10
     clips:
     - {fileID: 8300000, guid: bd77cba8eee58be4d8e504aef7a0bbd6, type: 3}
+  - sfx: 11
+    clips:
+    - {fileID: 8300000, guid: 6f544d8ce150c424ea7add38c68e8153, type: 3}
+    - {fileID: 8300000, guid: 56a438f7385585340ad0dbfeb7a290a5, type: 3}
+    - {fileID: 8300000, guid: 1d10fa244f11dbb4190131b5c4ce67d3, type: 3}
+    - {fileID: 8300000, guid: 057f73a2bfec3004baa1ba92670a5fbf, type: 3}
+    - {fileID: 8300000, guid: 64d78cfaa2c691043a1fcee315c89e73, type: 3}
+    - {fileID: 8300000, guid: d5cf0d8804df1584d8542f8d35c45c16, type: 3}

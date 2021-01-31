@@ -6,7 +6,7 @@ public class Hookable : Retractable
 {
     public int value;
     [SerializeField]
-    private bool isShipPart;
+    public bool isShipPart;
     [HideInInspector]
     public bool isHooked = false;
 

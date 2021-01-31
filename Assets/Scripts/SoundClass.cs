@@ -13,7 +13,8 @@ public enum SFX
     Footstep,
     Nirn,
     HookGrab,
-    Rumble
+    Rumble,
+    Happy
 }
 
 [System.Serializable]
