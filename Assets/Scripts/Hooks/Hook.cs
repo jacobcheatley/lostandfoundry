@@ -345,6 +345,7 @@ public class Hook : Retractable
             movement = perpendicular.normalized;
             transform.localRotation = lookingAtMouse;
             AddRopeRendererPoint(transform.position);
+            AddRopeRendererPoint(transform.position);
         }
     }
 
@@ -403,6 +404,7 @@ public class Hook : Retractable
         // We might stop travelling for one of several reasons - timeout, hooked too much, etc.
         // Regardless, all of our moving-hook-mode coroutines need to stop.
         travellingCoroutines.ForEach(StopCoroutine);
+        launched = false;
 
         if (isChild || launchCount >= maxLaunchCount)
         {
@@ -456,7 +458,7 @@ public class Hook : Retractable
                 );
 
             // If we've reached the target rope segment... (with some tolerance)
-            if (distanceToTarget.sqrMagnitude * 2 <= (retractionRate * Time.deltaTime) * (retractionRate * Time.deltaTime))
+            if (distanceToTarget.sqrMagnitude * distanceToTarget.sqrMagnitude <= (retractionRate * Time.deltaTime) * (retractionRate * Time.deltaTime))
             {
                 // Start moving towards the next segment
                 currentMovingIndex -= 1;
