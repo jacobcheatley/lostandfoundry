@@ -1,7 +1,7 @@
 {
 "companyName": "Innumerable",
 "productName": "LostAndFoundry",
-"productVersion": "0.0.86",
+"productVersion": "0.0.87",
 "dataUrl": "WebGL.data.unityweb",
 "wasmCodeUrl": "WebGL.wasm.code.unityweb",
 "wasmFrameworkUrl": "WebGL.wasm.framework.unityweb",
