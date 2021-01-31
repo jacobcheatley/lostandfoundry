@@ -455,8 +455,8 @@ public class Hook : Retractable
                     (distanceToTarget.normalized * retractionRate * Time.deltaTime)
                 );
 
-            // If we've reached the target rope segment...
-            if (distanceToTarget.sqrMagnitude <= (retractionRate * Time.deltaTime) * (retractionRate * Time.deltaTime))
+            // If we've reached the target rope segment... (with some tolerance)
+            if (distanceToTarget.sqrMagnitude * 2 <= (retractionRate * Time.deltaTime) * (retractionRate * Time.deltaTime))
             {
                 // Start moving towards the next segment
                 currentMovingIndex -= 1;
