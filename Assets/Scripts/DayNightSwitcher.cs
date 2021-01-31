@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using TMPro;
 
 public class DayNightSwitcher : MonoBehaviour
 {
@@ -30,6 +31,8 @@ public class DayNightSwitcher : MonoBehaviour
     private SpriteRenderer darkness;
     [SerializeField]
     private Animator hammerAnimator;
+    [SerializeField]
+    private TextMeshProUGUI nightText;
 
     [Header("Properties and settings")]
     [SerializeField]
@@ -51,6 +54,7 @@ public class DayNightSwitcher : MonoBehaviour
     private Camera mainCamera;
     private bool day = true;
     public float cameraSizeDayUpgradeBonus = 0;
+    private int nightCount = 0;
 
     void Start()
     {
@@ -79,6 +83,8 @@ public class DayNightSwitcher : MonoBehaviour
     
     public void Night()
     {
+        nightCount++;
+        nightText.text = $"Night {nightCount}";
         AudioController.EndDepthAudio();
         day = false;
         Debug.Log("Night");
