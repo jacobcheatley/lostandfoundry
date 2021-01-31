@@ -79,7 +79,7 @@ public class LevelGenerator : MonoBehaviour
                 Vector2 chunkCentre = ChunkCentre(x, y);
                 LevelGeneratorDepthInfo depthInfo = WhereAmIAt(y).Item2;
                 GameObject chunkBg = Instantiate(depthInfo.backgroundPrefab, chunkCentre, Quaternion.identity, backgroundParent);
-                chunkBg.transform.localPosition = new Vector3(chunkBg.transform.position.x, chunkBg.transform.position.y, 0);
+                chunkBg.transform.localPosition = new Vector3(chunkBg.transform.position.x, chunkBg.transform.position.y, 2);
             }
         }
     }
@@ -176,7 +176,7 @@ public class LevelGenerator : MonoBehaviour
             dontCentrePlace = true;
             Debug.Log($"Placing ship piece at {x}, {y}");
             GameObject shipPiece = shipPieces[ShipTracker.ShipPiecesCollected];
-            Instantiate(shipPiece, chunkCentre, Quaternion.identity, levelParent);
+            Instantiate(shipPiece, (Vector3)chunkCentre + Vector3.forward, Quaternion.identity, levelParent);
         }
 
         for (int xx = 0; xx < numSpots; xx++)
@@ -189,7 +189,7 @@ public class LevelGenerator : MonoBehaviour
                 {
                     Vector2 targetLocation = spotStart + new Vector2(xx * spotSpacing.x, yy * spotSpacing.y) + Random.insideUnitCircle * spotWiggle;
                     HookableInfo hookableInfo = weightedHookablesThisChunk[Random.Range(0, weightedHookablesThisChunk.Count)];
-                    Instantiate(hookableInfo.hookablePrefab, targetLocation, Quaternion.Euler(0, 0, Random.Range(0, 360)), levelParent);
+                    Instantiate(hookableInfo.hookablePrefab, (Vector3)targetLocation + Vector3.forward, Quaternion.Euler(0, 0, Random.Range(0, 360)), levelParent);
                 }
             }
         }

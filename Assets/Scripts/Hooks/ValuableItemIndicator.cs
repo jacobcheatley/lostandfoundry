@@ -6,10 +6,12 @@ public class ValuableItemIndicator : MonoBehaviour
 {
     [SerializeField]
     private SpriteRenderer sprite;
+    [SerializeField]
+    private Hook hook;
 
     private void Update()
     {
-        if (SkillTracker.IsSkillUnlocked(SkillID.ValuablesRadar))
+        if (!hook.isChild && SkillTracker.IsSkillUnlocked(SkillID.ValuablesRadar))
         {
             sprite.enabled = true;
             Vector3 target = LevelGenerator.instance.valuableTargetLocation;
