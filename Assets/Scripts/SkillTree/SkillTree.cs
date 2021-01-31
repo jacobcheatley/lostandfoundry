@@ -88,7 +88,7 @@ public static class SkillTree
         { SkillID.Redirect, new Skill(SkillID.ValuablesRadar, "Targeted Redirect", "TODO DESC", "", 100) },
         { SkillID.HomingExtraShots, new Skill(SkillID.HookSpeed3, "Homing Extra Shots", "TODO DESC", "", 1000) },
         { SkillID.QuantumTunnel, new Skill(SkillID.Pierce2, "Quantum Tunnel", "TODO DESC", "", 200) },
-        { SkillID.WaterImmunity, new Skill(SkillID.Pierce2, "Water Immunity", "TODO DESC", "", 300) }, // UNIMPLEMENTED
-        { SkillID.MagmaImmunity, new Skill(SkillID.Pierce3, "Magma Immunity", "TODO DESC", "", 1000) } // UNIMPLEMENTED
+        //{ SkillID.WaterImmunity, new Skill(SkillID.Pierce2, "Water Immunity", "TODO DESC", "", 300) }, // UNIMPLEMENTED
+        //{ SkillID.MagmaImmunity, new Skill(SkillID.Pierce3, "Magma Immunity", "TODO DESC", "", 1000) } // UNIMPLEMENTED
     };
 }

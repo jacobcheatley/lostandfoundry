@@ -6,7 +6,7 @@ using UnityEngine;
 public class Hook : Retractable
 {
     [SerializeField]
-    private bool isChild = false;
+    public bool isChild = false;
 
     [Header("GameObject References")]
     [HideInInspector]
